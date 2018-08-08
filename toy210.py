@@ -26,6 +26,8 @@ from PyQt5.QtCore import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import datetime
+from numpy import *
+from struct import *
 
 class ErrorHighlighter(QSyntaxHighlighter) :
     def __init__(self, lines) :
@@ -38,9 +40,6 @@ class ErrorHighlighter(QSyntaxHighlighter) :
         fmt.setForeground(Qt.yellow)
         fmt.setBackground(Qt.red)
         
-        
-        
-
 class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -114,6 +113,7 @@ class MainWindow(QWidget):
         self.shadercompile.triggered.connect(self.compileShader)
         self.shadercompilesfx = self.shadermenu.addAction("&Compile SFX")
         self.shadercompilesfx.setShortcut("SHIFT+F5")
+        self.shadercompilesfx.triggered.connect(self.compileShaderSFX)
         self.helpmenu = self.menubar.addMenu("&Help")
         self.helpabout = self.helpmenu.addAction("&About")
         self.mainLayout.addWidget(self.menubar)
@@ -140,6 +140,9 @@ class MainWindow(QWidget):
         self.splitter3.addWidget(self.splitter4)
         self.splitter3.addWidget(self.editorsfx)
         
+        self.sfxglwidget = sfxGLWidget(self)
+        self.splitter4.addWidget(self.sfxglwidget)
+        
         self.customsource = "void mainImage( out vec4 fragColor, in vec2 fragCoord )\n\
 {\n\
     // Normalized pixel coordinates (from 0 to 1)\n\
@@ -161,11 +164,35 @@ uniform vec2 iResolution;\n\n"
     mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n"
 
+        self.sfxcustomsource = "vec2 mainSound( float time )\n\
+{\n\
+    // A 440 Hz wave that attenuates quickly overt time\n\
+    return vec2( sin(6.2831*440.0*time)*exp(-3.0*time) );\n\
+}\n\n"
+        self.sfxprefix = "\n#version 130\n\
+\n\
+uniform float iBlockOffset;\n\
+uniform float iSampleRate;\n\n"
+        self.sfxsuffix = "\n\nvoid main()\n\
+{\n\
+   float t = iBlockOffset + ((gl_FragCoord.x-0.5) + (gl_FragCoord.y-0.5)*512.0)/iSampleRate;\n\
+   vec2 y = mainSound( t );\n\
+   vec2 v  = floor((0.5+0.5*y)*65536.0);\n\
+   vec2 vl = mod(v,256.0)/255.0;\n\
+   vec2 vh = floor(v/256.0)/255.0;\n\
+   gl_FragColor = vec4(vl.x,vh.x,vl.y,vh.y);\n\
+}\n"
+        self.editorsfx.insertPlainText(self.sfxcustomsource)
+        
         self.running = True
         self.startpause = datetime.datetime.now()
         
         self.clean = True
         self.filename = ""
+    
+    def compileShaderSFX(self) :
+        log = self.sfxglwidget.newShader(self.sfxprefix + self.editorsfx.toPlainText() + self.sfxsuffix).decode('utf-8')
+        print(log)
 
     def compileShader(self) :
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix).decode('utf-8')
@@ -267,6 +294,112 @@ uniform vec2 iResolution;\n\n"
         
         self.clean = True
         
+class sfxGLWidget(QOpenGLWidget,QObject):
+    def __init__(self, parent):
+        QOpenGLWidget.__init__(self, parent)
+        self.setMinimumSize(512,512)
+        self.setMaximumSize(512,512)
+        self.program = 0
+        self.iSampleRateLocation = 0
+        self.iBlockOffsetLocation = 0
+        self.hasShader = False
+        self.parent = parent
+        self.duration = 60 #1 min of sound
+        self.samplerate = 44100 #TODO: add selector to code
+        self.nsamples = 2*self.duration*self.samplerate
+        self.nblocks = int(ceil(float(self.nsamples)/float(512*512)))
+        self.blocksize = 512*512
+        self.nsamples_real = 2*self.nblocks*self.blocksize
+        self.duration_real = float(self.nsamples_real)/float(self.samplerate)
+        self.image = [0]*self.blocksize*2
+    
+    def paintGL(self):
+        return
+    
+    def initializeGL(self):
+        glEnable(GL_DEPTH_TEST)
+        
+        self.framebuffer = glGenFramebuffers(1)
+        glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        
+        self.texture = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, self.texture)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.image)
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+        
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture, 0)
+        
+    def newShader(self, source) :
+        self.shader = glCreateShader(GL_FRAGMENT_SHADER)
+        glShaderSource(self.shader, source)
+        glCompileShader(self.shader)
+        
+        status = glGetShaderiv(self.shader, GL_COMPILE_STATUS)
+        if status != GL_TRUE :
+            log = glGetShaderInfoLog(self.shader)
+            return log
+        
+        self.program = glCreateProgram()
+        glAttachShader(self.program, self.shader)
+        glLinkProgram(self.program)
+        
+        status = glGetProgramiv(self.program, GL_LINK_STATUS)
+        if status != GL_TRUE :
+            log = glGetProgramInfoLog(self.program)
+            return log
+        
+        self.iBlockOffsetLocation = glGetUniformLocation(self.program, 'iBlockOffset')
+        self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
+        
+        music = []
+        for i in range(self.nblocks) :
+            glUseProgram(self.program)
+            glUniform1f(self.iBlockOffsetLocation, float(i*self.blocksize))
+            glUniform1f(self.iSampleRateLocation, self.samplerate) 
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+            glViewport(0,0,512,512)
+            
+            glClearColor(0.,0.,0.,1.)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            #glLoadIdentity()
+
+            glColor3f( 1.0, 1.5, 0.0)
+            glPolygonMode(GL_FRONT, GL_FILL)
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(-1.,-1.,0.)
+            glVertex3f(-1.,1.,0.)
+            glVertex3f(1.,1.,0.)
+            
+            glVertex3f(1.,1.,0.)
+            glVertex3f(1.,-1.,0.)
+            glVertex3f(-1.,-1.,0.)
+            glEnd()
+
+            glFlush()
+            
+            music_i = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
+            
+            #FIXME: remove shit
+            #print(music_i)
+            
+            music += music_i
+        
+        left = []
+        right = []
+        #for chunk in music :
+            #print(len(chunk))
+            #(l,r) = unpack("e", str(byte))
+            #left += [l]
+            #right += [r]
+        #print left
+        return b'Success.'
+        
 class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
@@ -349,6 +482,8 @@ class glWidget(QOpenGLWidget,QObject):
         self.hasShader = True
         
         return b'Success.'
+
+
 
 if __name__ == '__main__':
     app = QApplication(['Toy210'])
