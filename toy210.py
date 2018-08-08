@@ -71,6 +71,8 @@ class MainWindow(QWidget):
         self.filemenu = self.menubar.addMenu("&File")
         self.filenew = self.filemenu.addAction("&New")
         self.fileopen = self.filemenu.addAction("&Open")
+        self.fileopen.setShortcut("CTRL+O")
+        self.fileopen.triggered.connect(self.openFile)
         self.filemenu.addSeparator()
         self.filesave = self.filemenu.addAction("&Save")
         self.filesave.setShortcut("CTRL+S")
@@ -194,6 +196,22 @@ uniform vec2 iResolution;\n\n"
         self.filename = str(QFileDialog.getSaveFileName(self, "Save As...","","Shaders (*.frag *.glsl)")[0])
         if self.filename == "" : return
         self.save()
+        
+    def openFile(self) :
+        self.filename = str(QFileDialog.getOpenFileName(self, "Open...","","Shaders (*.frag *.glsl)")[0])
+        if self.filename == "" : return
+        
+        shadertext = ""
+        self.editor.setPlainText("")
+        with open(self.filename, "rt") as f :
+            shadertext = f.read()
+            f.close()
+        shadertext = shadertext.replace(self.prefix, "")
+        shadertext = shadertext.replace(self.suffix, "")
+        self.editor.setPlainText(shadertext)
+        self.editor.update()
+        
+        self.clean = True
         
 class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
