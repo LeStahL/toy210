@@ -20,6 +20,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import datetime
@@ -60,6 +61,7 @@ class MainWindow(QWidget):
         self.splitter1.addWidget(self.splitter2)
         self.editor = QTextEdit(self)
         self.editor.setMinimumWidth(512)
+        self.editor.textChanged.connect(self.textChanged)
         self.splitter1.addWidget(self.editor)
         
         self.mainLayout = QVBoxLayout()
@@ -71,11 +73,15 @@ class MainWindow(QWidget):
         self.fileopen = self.filemenu.addAction("&Open")
         self.filemenu.addSeparator()
         self.filesave = self.filemenu.addAction("&Save")
+        self.filesave.setShortcut("CTRL+S")
+        self.filesave.triggered.connect(self.save)
         self.filesaveas = self.filemenu.addAction("Save &as...")
+        self.filesaveas.setShortcut("CTRL+SHIFT+S")
+        self.filesaveas.triggered.connect(self.saveAs)
         self.filemenu.addSeparator()
         self.filequit = self.filemenu.addAction("&Quit")
         self.filequit.setShortcut('CTRL+Q')
-        self.filequit.triggered.connect(qApp.quit)
+        self.filequit.triggered.connect(self.quit)
         self.editmenu = self.menubar.addMenu("&Edit")
         self.viewmenu = self.menubar.addMenu("&View")
         self.shadermenu = self.menubar.addMenu("&Shader")
@@ -113,6 +119,9 @@ uniform vec2 iResolution;\n\n"
         
         self.running = True
         self.startpause = datetime.datetime.now()
+        
+        self.clean = True
+        self.filename = ""
 
     def compileShader(self) :
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
@@ -145,7 +154,47 @@ uniform vec2 iResolution;\n\n"
         self.startpause = datetime.datetime.now()
         self.visuals.tick()
         self.visuals.paintGL()
+        
+    def textChanged(self) :
+        self.clean = False
+        
+    def quit(self) :
+        if self.clean :
+            qApp.quit()
+        else :
+            m = QMessageBox()
+            m.setIcon(QMessageBox.Warning)
+            m.setText("Unsaved progress. Save before exiting?")
+            m.setInformativeText("The shader contains unsaved modifications. Save before exiting?")
+            m.setWindowTitle("Save changes before exiting?")
+            m.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+            m.buttonClicked.connect(self.quitBoxHandler)
+            m.exec_()
+            return
+    
+    def quitBoxHandler(self, i) :
+        if i.text() == "&Yes" :
+            self.save()
+        elif i.text() == "&Cancel" :
+            return
+        qApp.quit()
+            
+    def save(self) :
+        if self.filename == "" :
+            self.saveAs()
+            return
+        if self.filename == "" :
+            return
+        with open(self.filename, "wt") as f :
+            f.write(self.prefix + self.editor.toPlainText() + self.suffix)
+            f.close()
+        self.clean = True
 
+    def saveAs(self) :
+        self.filename = str(QFileDialog.getSaveFileName(self, "Save As...","","Shaders (*.frag *.glsl)")[0])
+        if self.filename == "" : return
+        self.save()
+        
 class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
