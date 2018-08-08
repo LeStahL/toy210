@@ -25,6 +25,20 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import datetime
 
+class ErrorHighlighter(QSyntaxHighlighter) :
+    def __init__(self, lines) :
+        super(ErrorHighlighter, self).__init__()
+        self.lines = lines
+        
+    def highlightBlock(self, text) :
+        fmt = QTextCharFormat()
+        fmt.setFontWeight(QFont.Bold)
+        fmt.setForeground(Qt.yellow)
+        fmt.setBackground(Qt.red)
+        
+        
+        
+
 class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -124,8 +138,12 @@ uniform vec2 iResolution;\n\n"
         self.filename = ""
 
     def compileShader(self) :
-        log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
+        log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix).decode('utf-8')
         self.debugoutput.setPlainText(log)
+        
+        #TODO: Syntax highlighting here
+        #for line in log.split('\n') :
+            #print(line)
     
     def resetTime(self) :
         self.visuals.dst = datetime.datetime.now()
@@ -292,7 +310,7 @@ class glWidget(QOpenGLWidget,QObject):
         
         self.hasShader = True
         
-        return "Success."
+        return b'Success.'
 
 if __name__ == '__main__':
     app = QApplication(['Toy210'])
