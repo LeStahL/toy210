@@ -46,6 +46,12 @@ class MainWindow(QWidget):
         self.resetbutton.setText("|<")
         self.resetbutton.clicked.connect(self.resetTime)
         self.toolbarlayout.addWidget(self.resetbutton)
+        self.forwardedit = QLineEdit(self)
+        self.toolbarlayout.addWidget(self.forwardedit)
+        self.forwardbutton = QPushButton(self)
+        self.forwardbutton.setText(">>")
+        self.forwardbutton.clicked.connect(self.forward)
+        self.toolbarlayout.addWidget(self.forwardbutton)
         self.toolbarwidget = QWidget(self)
         self.toolbarwidget.setLayout(self.toolbarlayout)
         self.splitter2.addWidget(self.toolbarwidget)
@@ -130,6 +136,14 @@ uniform vec2 iResolution;\n\n"
         else :
             self.visuals.timer.stop()
             self.startpause = datetime.datetime.now()
+        self.visuals.paintGL()
+    
+    def forward(self) :
+        self.visuals.dst = datetime.datetime.now() - datetime.timedelta(0,float(self.forwardedit.text()))
+        self.visuals.starttime = self.visuals.dst.minute*60.+self.visuals.dst.second*1.+self.visuals.dst.microsecond*1.e-6
+        self.visuals.time = float(self.forwardedit.text())
+        self.startpause = datetime.datetime.now()
+        self.visuals.tick()
         self.visuals.paintGL()
 
 class glWidget(QOpenGLWidget,QObject):
