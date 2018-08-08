@@ -39,8 +39,12 @@ class MainWindow(QWidget):
         self.timelabel.setText("00:00.000")
         self.toolbarlayout.addWidget(self.timelabel)
         self.playbutton = QPushButton(self)
+        self.playbutton.setText(">")
+        self.playbutton.clicked.connect(self.pauseTime)
         self.toolbarlayout.addWidget(self.playbutton)
         self.resetbutton = QPushButton(self)
+        self.resetbutton.setText("|<")
+        self.resetbutton.clicked.connect(self.resetTime)
         self.toolbarlayout.addWidget(self.resetbutton)
         self.toolbarwidget = QWidget(self)
         self.toolbarwidget.setLayout(self.toolbarlayout)
@@ -55,6 +59,7 @@ class MainWindow(QWidget):
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(0,0,0,0)
         self.menubar = QMenuBar(self)
+        self.menubar.setMaximumHeight(25.)
         self.filemenu = self.menubar.addMenu("&File")
         self.filenew = self.filemenu.addAction("&New")
         self.fileopen = self.filemenu.addAction("&Open")
@@ -99,11 +104,33 @@ uniform vec2 iResolution;\n\n"
 }\n"
 
         self.compileShader()
+        
+        self.running = True
+        self.startpause = datetime.datetime.now()
 
     def compileShader(self) :
-        print self.prefix + self.editor.toPlainText() + self.suffix
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
         self.debugoutput.setPlainText(log)
+    
+    def resetTime(self) :
+        self.visuals.dst = datetime.datetime.now()
+        self.visuals.starttime = self.visuals.dst.minute*60.+self.visuals.dst.second*1.+self.visuals.dst.microsecond*1.e-6
+        self.visuals.time = 0.
+        self.startpause = datetime.datetime.now()
+        self.visuals.tick()
+        self.visuals.paintGL()
+
+    def pauseTime(self) :
+        self.running = not self.running
+        if self.running :
+            self.visuals.timer.start(1000./30.)
+            self.visuals.dst = self.visuals.dst + (datetime.datetime.now()-self.startpause)
+            self.visuals.starttime = self.visuals.dst.minute*60.+self.visuals.dst.second*1.+self.visuals.dst.microsecond*1.e-6
+            
+        else :
+            self.visuals.timer.stop()
+            self.startpause = datetime.datetime.now()
+        self.visuals.paintGL()
 
 class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
@@ -156,7 +183,7 @@ class glWidget(QOpenGLWidget,QObject):
         glEnd()
 
         glFlush()
-
+        
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
         
