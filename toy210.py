@@ -117,8 +117,6 @@ uniform vec2 iResolution;\n\n"
     mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n"
 
-        self.compileShader()
-        
         self.running = True
         self.startpause = datetime.datetime.now()
         
