@@ -68,18 +68,49 @@ class MainWindow(QWidget):
         self.viewmenu = self.menubar.addMenu("&View")
         self.shadermenu = self.menubar.addMenu("&Shader")
         self.shadercompile = self.shadermenu.addAction("&Compile")
+        self.shadercompile.setShortcut('F5')
+        self.shadercompile.triggered.connect(self.compileShader)
         self.helpmenu = self.menubar.addMenu("&Help")
         self.helpabout = self.helpmenu.addAction("&About")
         self.mainLayout.addWidget(self.menubar)
         self.mainLayout.addWidget(self.splitter1)
         self.setLayout(self.mainLayout)
+        
+        self.customsource = "void mainImage( out vec4 fragColor, in vec2 fragCoord )\n\
+{\n\
+    // Normalized pixel coordinates (from 0 to 1)\n\
+    vec2 uv = fragCoord/iResolution.xy;\n\
+\n\
+    // Time varying pixel color\n\
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));\n\
+\n\
+    // Output to screen\n\
+    fragColor = vec4(col,1.0);\n\
+}\n\n"
+        self.editor.insertPlainText(self.customsource)
+        self.prefix = "\n#version 130\n\
+\n\
+uniform float iTime;\n\
+uniform vec2 iResolution;\n\n"
+        self.suffix = "void main()\n\
+{\n\
+    mainImage(gl_FragColor, gl_FragCoord.xy);\n\
+}\n"
+
+    def compileShader(self) :
+        print self.prefix + self.editor.toPlainText() + self.suffix
+        log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
+        self.debugoutput.setPlainText(log)
 
 class glWidget(QOpenGLWidget):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(640, 480)
+        self.program = 0
 
     def paintGL(self):
+        glUseProgram(self.program)
+        
         glClearColor(0.,0.,0.,1.)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
@@ -101,9 +132,41 @@ class glWidget(QOpenGLWidget):
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
+        
+    def newShader(self, source) :
+        self.shader = glCreateShader(GL_FRAGMENT_SHADER)
+        glShaderSource(self.shader, source)
+        glCompileShader(self.shader)
+        
+        status = glGetShaderiv(self.shader, GL_COMPILE_STATUS)
+        if status != GL_TRUE :
+            #print "Shader Compilation failed."
+            log = glGetShaderInfoLog(self.shader)
+            #print "Info log is:"
+            #print log
+            return log
+        
+        self.program = glCreateProgram()
+        glAttachShader(self.program, self.shader)
+        glLinkProgram(self.program)
+        
+        status = glGetProgramiv(self.program, GL_LINK_STATUS)
+        if status != GL_TRUE :
+            #print "Shader Linking failed."
+            log = glGetProgramInfoLog(self.program)
+            #print "Info log is:"
+            #print log
+            return log
+        
+        self.iTimeLocation = glGetUniformLocation(self.program, 'iTime')
+        self.iResolutionLocation = glGetUniformLocation(self.program, 'iResolution')
+        
+        self.repaint()
+        
+        return "Success."
 
 if __name__ == '__main__':
-    app = QApplication(['Yo'])
+    app = QApplication(['Toy210'])
     window = MainWindow()
     window.show()
     app.exec_()
