@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # toy210 - the team210 live shader editor
 #
 # Copyright (C) 2017/2018 Alexander Kraus <nr4@z10.info>
