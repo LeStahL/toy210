@@ -22,6 +22,7 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import datetime
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -97,6 +98,8 @@ uniform vec2 iResolution;\n\n"
     mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n"
 
+        self.compileShader()
+
     def compileShader(self) :
         print self.prefix + self.editor.toPlainText() + self.suffix
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
@@ -107,9 +110,20 @@ class glWidget(QOpenGLWidget):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(640, 480)
         self.program = 0
+        self.iTimeLocation = 0
+        self.iResolutionLocation = 0
+        self.hasShader = False
 
     def paintGL(self):
-        glUseProgram(self.program)
+        if self.hasShader :
+            glUseProgram(self.program)
+        
+            dt = datetime.datetime.now()
+            time = dt.minute*60.+dt.second*1.+dt.microsecond*1.e-6
+            print time
+            
+            glUniform1f(self.iTimeLocation, time)
+            glUniform2f(self.iResolutionLocation, self.width(), self.height())
         
         glClearColor(0.,0.,0.,1.)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -140,10 +154,7 @@ class glWidget(QOpenGLWidget):
         
         status = glGetShaderiv(self.shader, GL_COMPILE_STATUS)
         if status != GL_TRUE :
-            #print "Shader Compilation failed."
             log = glGetShaderInfoLog(self.shader)
-            #print "Info log is:"
-            #print log
             return log
         
         self.program = glCreateProgram()
@@ -152,16 +163,15 @@ class glWidget(QOpenGLWidget):
         
         status = glGetProgramiv(self.program, GL_LINK_STATUS)
         if status != GL_TRUE :
-            #print "Shader Linking failed."
             log = glGetProgramInfoLog(self.program)
-            #print "Info log is:"
-            #print log
             return log
         
         self.iTimeLocation = glGetUniformLocation(self.program, 'iTime')
         self.iResolutionLocation = glGetUniformLocation(self.program, 'iResolution')
         
         self.repaint()
+        
+        self.hasShader = True
         
         return "Success."
 
