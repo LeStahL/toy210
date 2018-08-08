@@ -195,13 +195,21 @@ uniform vec2 iResolution;\n\n"
             self.startpause = datetime.datetime.now()
         self.visuals.paintGL()
     
-    def forward(self) :
-        self.visuals.dst = datetime.datetime.now() - datetime.timedelta(0,float(self.forwardedit.text()))
-        self.visuals.starttime = self.visuals.dst.minute*60.+self.visuals.dst.second*1.+self.visuals.dst.microsecond*1.e-6
-        self.visuals.time = float(self.forwardedit.text())
-        self.startpause = datetime.datetime.now()
-        self.visuals.tick()
-        self.visuals.paintGL()
+    def forward(self):
+        if self.forwardedit.text().isnumeric():
+            self.visuals.dst = datetime.datetime.now() - datetime.timedelta(0,float(self.forwardedit.text()))
+            self.visuals.starttime = self.visuals.dst.minute*60.+self.visuals.dst.second*1.+self.visuals.dst.microsecond*1.e-6
+            self.visuals.time = float(self.forwardedit.text())
+            self.startpause = datetime.datetime.now()
+            self.visuals.tick()
+            self.visuals.paintGL()
+        else:
+            m = QMessageBox()
+            m.setIcon(QMessageBox.Warning)
+            m.setInformativeText("That's no number you useless piece of shit!")
+            m.setStandardButtons(QMessageBox.Ok)
+            m.exec_()
+            return
         
     def textChanged(self) :
         self.clean = False
