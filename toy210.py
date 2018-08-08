@@ -105,7 +105,7 @@ uniform vec2 iResolution;\n\n"
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix)
         self.debugoutput.setPlainText(log)
 
-class glWidget(QOpenGLWidget):
+class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(640, 480)
@@ -113,18 +113,31 @@ class glWidget(QOpenGLWidget):
         self.iTimeLocation = 0
         self.iResolutionLocation = 0
         self.hasShader = False
+        self.dst = datetime.datetime.now()
+        self.starttime = self.dst.minute*60.+self.dst.second*1.+self.dst.microsecond*1.e-6
+        self.time = 0.
+        
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.tick)
+        self.timer.setSingleShot(False)
+        self.timer.start(1000./30.)
+        
+        self.parent = parent
+
+    def tick(self) :
+        dt = datetime.datetime.now()
+        self.time = dt.minute*60.+dt.second*1.+dt.microsecond*1.e-6 - self.starttime
+        self.repaint()
+        self.parent.timelabel.setText(str(dt-self.dst))
+        self.parent.timelabel.repaint()
 
     def paintGL(self):
         if self.hasShader :
             glUseProgram(self.program)
-        
-            dt = datetime.datetime.now()
-            time = dt.minute*60.+dt.second*1.+dt.microsecond*1.e-6
-            print time
             
-            glUniform1f(self.iTimeLocation, time)
+            glUniform1f(self.iTimeLocation, self.time)
             glUniform2f(self.iResolutionLocation, self.width(), self.height())
-        
+            
         glClearColor(0.,0.,0.,1.)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
