@@ -325,11 +325,22 @@ uniform float iSampleRate;\n\n"
         self.clean = True
 
     def saveAs(self) :
+        was_running = self.running
+        if self.running :
+            self.pauseTime()
+            
         self.filename = str(QFileDialog.getSaveFileName(self, "Save As...","","Shaders (*.frag *.glsl)")[0])
         if self.filename == "" : return
         self.save()
         
+        if was_running :
+            self.pauseTime()
+        
     def openFile(self) :
+        was_running = self.running
+        if self.running :
+            self.pauseTime()
+            
         self.filename = str(QFileDialog.getOpenFileName(self, "Open...","","Shaders (*.frag *.glsl)")[0])
         if self.filename == "" : return
         
@@ -344,6 +355,9 @@ uniform float iSampleRate;\n\n"
         self.editor.update()
         
         self.clean = True
+        
+        if was_running :
+            self.pauseTime()
         
 class sfxGLWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
