@@ -364,12 +364,13 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(512,512)
         self.setMaximumSize(512,512)
+        self.resize(512,512)
         self.program = 0
         self.iSampleRateLocation = 0
         self.iBlockOffsetLocation = 0
         self.hasShader = False
         self.parent = parent
-        self.duration = 60 #1 min of sound
+        self.duration = 60. #1 min of sound
         self.samplerate = 44100 #TODO: add selector to code
         self.nsamples = 2*self.duration*self.samplerate
         self.nblocks = int(ceil(float(self.nsamples)/float(512*512)))
@@ -389,7 +390,7 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.image)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_BYTE, self.image)
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -421,39 +422,31 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
         
         music = []
+        glUseProgram(self.program)
+        glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        
         for i in range(self.nblocks) :
-            glUseProgram(self.program)
             glUniform1f(self.iBlockOffsetLocation, float(i*self.blocksize))
             glUniform1f(self.iSampleRateLocation, self.samplerate) 
             
-            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
             glViewport(0,0,512,512)
             
-            glClearColor(0.,0.,0.,1.)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            #glLoadIdentity()
+            glBegin(GL_QUADS);
+            glVertex3f(-1,-1,0);
+            glVertex3f(-1,1,0);
+            glVertex3f(1,1,0);
+            glVertex3f(1,-1,0);
+            glEnd();
 
-            glColor3f( 1.0, 1.5, 0.0)
-            glPolygonMode(GL_FRONT, GL_FILL)
-
-            glBegin(GL_TRIANGLES)
-            glVertex3f(-1.,-1.,0.)
-            glVertex3f(-1.,1.,0.)
-            glVertex3f(1.,1.,0.)
+            glFlush();
             
-            glVertex3f(1.,1.,0.)
-            glVertex3f(1.,-1.,0.)
-            glVertex3f(-1.,-1.,0.)
-            glEnd()
-
-            glFlush()
-            
-            music_i = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
+            music_i = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_BYTE)
             
             #FIXME: remove shit
-            #print(music_i)
+            print(music_i)
             
-            music += music_i
+            music += [ music_i ]
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
         left = []
         right = []
