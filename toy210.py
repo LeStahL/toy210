@@ -296,7 +296,6 @@ uniform float iSampleRate;\n\n"
             pos = cursor.position()
             text = text.replace('\t', '    ')
             self.editor.setPlainText(text)
-            print(cursor.position())
             cursor.setPosition(pos+3)
             self.editor.setTextCursor(cursor)
             self.editor.update()
