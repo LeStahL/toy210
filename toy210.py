@@ -290,6 +290,16 @@ uniform float iSampleRate;\n\n"
             return
         
     def textChanged(self) :
+        text = self.editor.toPlainText()
+        if '\t' in text:
+            cursor = self.editor.textCursor()
+            pos = cursor.position()
+            text = text.replace('\t', '    ')
+            self.editor.setPlainText(text)
+            print(cursor.position())
+            cursor.setPosition(pos+3)
+            self.editor.setTextCursor(cursor)
+            self.editor.update()
         self.clean = False
         
     def quit(self) :
