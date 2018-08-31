@@ -28,11 +28,12 @@ from OpenGL.GLU import *
 import datetime
 from numpy import *
 from struct import *
+#from pyaudio import * //TODO: download 
 
 class SyntaxHighlighter(QSyntaxHighlighter) :
     type_ids = [ 'vec2', 'vec3', 'int', 'vec4', 'mat2', 'mat3', 'mat4', 'void', 'float' ]
     flow_ids = [ 'in', 'out', 'uniform', 'const' ]
-    syntax_ids = [ 'for', 'if', 'while', 'struct', 'return', 'else' ]
+    syntax_ids = [ 'for', 'if', 'while', 'struct', 'return', 'else', 'break', 'continue' ]
     operator_ids = [ '\+', '-', '\*', '/', '\+=', '-=', '*=', '/=', '==', '!=', '\,', '\.' ]
     builtin_ids = [ 'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
                    'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh', 
