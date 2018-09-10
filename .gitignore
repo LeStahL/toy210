@@ -1,1 +1,4 @@
 build
+*.pyc
+*.kate-swp
+*.kdev4
