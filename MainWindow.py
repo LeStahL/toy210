@@ -158,7 +158,7 @@ uniform vec2 iResolution;\n\n"
         self.sfxcustomsource = "vec2 mainSound( float time )\n\
 {\n\
     // A 440 Hz wave that attenuates quickly overt time\n\
-    return vec2( sin(6.2831*440.0*time)*exp(-3.0*time) );\n\
+    return vec2( sin(6.2831*440.0*time) );\n\
 }\n\n"
         self.sfxprefix = "\n#version 130\n\
 \n\
@@ -182,6 +182,7 @@ uniform float iSampleRate;\n\n"
         self.filename = ""
         
         self.highlight = SyntaxHighlighter(self.editor.document())
+        self.sfxhighlight = SyntaxHighlighter(self.editorsfx.document())
     
     def compileShaderSFX(self) :
         log = self.sfxglwidget.newShader(self.sfxprefix + self.editorsfx.toPlainText() + self.sfxsuffix).decode('utf-8')

@@ -27,6 +27,7 @@ from OpenGL.GLU import *
 import datetime
 from numpy import *
 from struct import *
+import matplotlib.pyplot as plt
 
 class sfxGLWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
@@ -59,7 +60,7 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_BYTE, self.image)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.image)
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -90,9 +91,11 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.iBlockOffsetLocation = glGetUniformLocation(self.program, 'iBlockOffset')
         self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
         
-        music = []
         glUseProgram(self.program)
         glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        
+        OpenGL.UNSIGNED_BYTE_IMAGES_AS_STRING = True
+        music = bytearray(self.nblocks*self.blocksize)
         
         for i in range(self.nblocks) :
             glUniform1f(self.iBlockOffsetLocation, float(i*self.blocksize))
@@ -109,20 +112,44 @@ class sfxGLWidget(QOpenGLWidget,QObject):
 
             glFlush();
             
-            music_i = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_BYTE)
+            music[i*self.blocksize:(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
             
-            #FIXME: remove shit
-            print(music_i)
-            
-            music += [ music_i ]
+        #print music
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
         left = []
         right = []
+        
+        music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
+        music = (float16(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
+        
+        fig = plt.figure()
+        plt.plot(range(512), music[:512])
+        fig.show()
+        
+        #for chunk in  [ music[0] ]:
+            #for i in range(len(chunk)) :
+                #for j in range(len(chunk[i])) :
+                    #bdata = pack('<4B', chunk[i][j][0], chunk[i][j][1], chunk[i][j][2], chunk[i][j][3])
+                    #lr = frombuffer(buffer(bdata), dtype=float16)
+                    #(l, r) = unpack('2E', bdata)
+                    #print lr
+                    #(left,) = unpack('f', pack('<bb', chunk[i][j].astype(bytes)))
+                    #(right,) = unpack('f', pack('<bb', chunk[i][j].astype(char)))
+                    #print left.astype(float16),right.astype(float16)
+                    #print chunk[i][j]
+        
+        #for i in range(len(music)) :
+            #for j in range(len(music[i])) :
+                #for k in range(len(music[i][j])) :
+                    #print music[i][j][k][:2].astype(float16)
         #for chunk in music :
             #print(len(chunk))
             #(l,r) = unpack("e", str(byte))
             #left += [l]
             #right += [r]
         #print left
+        
+        #print music
+        
         return b'Success.'
