@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # toy210 - the team210 live shader editor
 #
@@ -21,7 +21,7 @@
 #TODO: remove
 from GLWidget import *
 from SFXGLWidget import *
-from SyntaxHighlighter import *
+
 #TODO: end
 
 import UiMainWindow
@@ -50,12 +50,15 @@ class MainWindow(QMainWindow):
         
         self.pages = []
         
+        self.ui.tabWidget.setTabsClosable(True)
+        
     def newSFX(self):
         return
     
     def newGFX(self):
         page = GFXPage(self)
         self.ui.tabWidget.addTab(page, QIcon(), "Untitled GFX*")
+        self.ui.tabWidget.setCurrentWidget(page)
         self.pages += [page]
         
     def updateTime(self, text):
@@ -66,8 +69,11 @@ class MainWindow(QMainWindow):
             self.enableEdit(True)
             self.enablePlayback(True)
             self.enableCapture(True, False, False)
+            self.ui.tabWidget.widget(index).modifyParent()
         #elif isinstance(self.ui.tabwidget.widget(index), SFXPage):
-            #TODO
+            self.enableEdit(True)
+            self.enablePlayback(True)
+            self.enableCapture(False, True, False)
         else: # Welcome Page
             self.enableEdit(False)
             self.enablePlayback(False)
@@ -93,6 +99,16 @@ class MainWindow(QMainWindow):
         self.ui.actionScreenshot.setEnabled(screen)
         self.ui.actionStream.setEnabled(sound)
         self.ui.actionVideo.setEnabled(vid)
+        
+    def quit(self): #TODO: proper save messages 
+        qApp.quit()
+        return
+    
+    def pause(self):
+        self.ui.tabWidget.widget(self.ui.tabWidget.currentIndex()).pause()
+        
+    def forward(self):
+        self.ui.tabWidget.widget(self.ui.tabWidget.currentIndex()).forward()
         
         #self.splitter1 = QSplitter(self)
         #self.splitter2 = QSplitter(self)

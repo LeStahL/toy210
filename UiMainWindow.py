@@ -185,6 +185,8 @@ class Ui_MainWindow(object):
         icon = QtGui.QIcon.fromTheme("media-seek-forward")
         self.actionSeek.setIcon(icon)
         self.actionSeek.setObjectName("actionSeek")
+        self.actionFPS_0 = QtWidgets.QAction(MainWindow)
+        self.actionFPS_0.setObjectName("actionFPS_0")
         self.menuNew.addAction(self.actionGFX_Shader)
         self.menuNew.addAction(self.actionSFX_Shader)
         self.menuNew.addAction(self.actionSequence)
@@ -235,6 +237,7 @@ class Ui_MainWindow(object):
         self.toolBar_3.addAction(self.actionPlay)
         self.toolBar_3.addAction(self.actionReset)
         self.toolBar_3.addAction(self.actionTime)
+        self.toolBar_3.addAction(self.actionFPS_0)
         self.toolBar_3.addAction(self.actionSeek)
         self.toolBar_4.addAction(self.actionScreenshot)
         self.toolBar_4.addAction(self.actionStream)
@@ -245,6 +248,9 @@ class Ui_MainWindow(object):
         self.actionGFX_Shader.triggered.connect(MainWindow.newGFX)
         self.actionSFX_Shader.triggered.connect(MainWindow.newSFX)
         self.tabWidget.currentChanged['int'].connect(MainWindow.tabSwitched)
+        self.actionPlay.triggered.connect(MainWindow.pause)
+        self.actionSeek.triggered.connect(MainWindow.forward)
+        self.actionQuit.triggered.connect(MainWindow.quit)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -324,4 +330,5 @@ class Ui_MainWindow(object):
         self.actionReset.setShortcut(_translate("MainWindow", "Ctrl+R"))
         self.actionTime.setText(_translate("MainWindow", "0:00:000"))
         self.actionSeek.setText(_translate("MainWindow", "Seek"))
+        self.actionFPS_0.setText(_translate("MainWindow", "FPS: 0"))
 

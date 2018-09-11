@@ -23,6 +23,7 @@ project(Toy210)
 set(TOY210_UI
     MainWindow
     GFXPage
+    SFXPage
 )
 set(TOY210_UIPY)
 foreach(ui IN ITEMS ${TOY210_UI})

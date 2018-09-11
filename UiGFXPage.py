@@ -25,7 +25,7 @@ class Ui_gfxPage(object):
         self.openGLWidget.setObjectName("openGLWidget")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
-        self.textEdit_2 = QtWidgets.QTextEdit(self.splitter_2)
+        self.textEdit_2 = GLSLEditorWidget(self.splitter_2)
         self.textEdit_2.setObjectName("textEdit_2")
         self.verticalLayout.addWidget(self.splitter_2)
 
@@ -36,4 +36,5 @@ class Ui_gfxPage(object):
         _translate = QtCore.QCoreApplication.translate
         gfxPage.setWindowTitle(_translate("gfxPage", "Form"))
 
+from GLSLEditorWidget import GLSLEditorWidget
 from GLWidget import glWidget

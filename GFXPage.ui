@@ -38,7 +38,7 @@
       <widget class="glWidget" name="openGLWidget"/>
       <widget class="QTextEdit" name="textEdit"/>
      </widget>
-     <widget class="QTextEdit" name="textEdit_2"/>
+     <widget class="GLSLEditorWidget" name="textEdit_2"/>
     </widget>
    </item>
   </layout>
@@ -48,6 +48,11 @@
    <class>glWidget</class>
    <extends>QOpenGLWidget</extends>
    <header location="global">GLWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GLSLEditorWidget</class>
+   <extends>QTextEdit</extends>
+   <header location="global">GLSLEditorWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -43,7 +43,7 @@ class glWidget(QOpenGLWidget,QObject):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.setSingleShot(False)
-        self.timer.start(1000./30.)
+        #self.timer.start(1000./30.)
         
         self.parent = parent.parentWidget().parentWidget().parentWidget()
 
