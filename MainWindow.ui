@@ -376,6 +376,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="icon">
+    <iconset theme="preferences-system"/>
+   </property>
    <property name="text">
     <string>Preferences...</string>
    </property>
