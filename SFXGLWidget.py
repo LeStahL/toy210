@@ -123,10 +123,15 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
+        #print(music)
+        fig = plt.figure()
+        plt.plot(range(len(music)), music)
+        fig.show()
+        
+        music = pack('<'+str(self.blocksize*self.nblocks*2)+'f', *music)
+        #print(music)
         
         self.music = music
-        #fig = plt.figure()
-        #plt.plot(range(512), music[:512])
-        #fig.show()
+        
         
         return b'Success.'
