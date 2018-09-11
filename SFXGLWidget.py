@@ -47,7 +47,7 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.blocksize = 512*512
         self.nsamples_real = 2*self.nblocks*self.blocksize
         self.duration_real = float(self.nsamples_real)/float(self.samplerate)
-        self.image = [0]*self.blocksize*2
+        self.image = bytearray(self.blocksize*4)
         self.music = None
         
     def omusic(self) :
@@ -61,6 +61,8 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         
         self.framebuffer = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        
+        print("framebuffer: ", self.framebuffer)
         
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
@@ -92,18 +94,23 @@ class sfxGLWidget(QOpenGLWidget,QObject):
             log = glGetProgramInfoLog(self.program)
             return log
         
+        glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        glUseProgram(self.program)
+        
         self.iBlockOffsetLocation = glGetUniformLocation(self.program, 'iBlockOffset')
         self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
         
-        glUseProgram(self.program)
-        glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+        print("blockoffsetlocation =",self.iBlockOffsetLocation)
+        print("sampleratelocation =", self.iSampleRateLocation)
         
         OpenGL.UNSIGNED_BYTE_IMAGES_AS_STRING = True
-        music = bytearray(self.nblocks*self.blocksize)
+        music = bytearray(self.nblocks*self.blocksize*4)
         
         for i in range(self.nblocks) :
-            glUniform1f(self.iBlockOffsetLocation, float(i*self.blocksize))
-            glUniform1f(self.iSampleRateLocation, self.samplerate) 
+            glUniform1f(self.iBlockOffsetLocation, float32(i*self.blocksize)/float32(self.samplerate))
+            glUniform1f(self.iSampleRateLocation, float32(self.samplerate)) 
+            print("block offset: ", float32(i*self.blocksize)/float32(self.samplerate))
+            print("sample rate: ", float32(self.samplerate))
             
             glViewport(0,0,512,512)
             
@@ -116,7 +123,8 @@ class sfxGLWidget(QOpenGLWidget,QObject):
 
             glFlush();
             
-            music[i*self.blocksize:(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
+            music[4*i*self.blocksize:4*(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
+            print(i)
             
         #print music
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
@@ -125,7 +133,12 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
         #print(music)
         fig = plt.figure()
-        plt.plot(range(len(music)), music)
+        #for i in range(100) :
+            #plt.plot(range(8192), music[8192*i:8192*(i+1)]+float(2*i))
+        #plt.plot(range(8192), music[100*8192:101*8192])
+        #plt.plot(range(8192), music[self.blocksize:self.blocksize+8192])
+        for i in range(10) :
+            plt.plot(range(self.blocksize), music[i*self.blocksize:(i+1)*self.blocksize]+float(2*i))
         fig.show()
         
         music = pack('<'+str(self.blocksize*self.nblocks*2)+'f', *music)
