@@ -31,7 +31,7 @@ from struct import *
 class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
-        self.setMinimumSize(640, 480)
+        self.setMinimumSize(320, 200)
         self.program = 0
         self.iTimeLocation = 0
         self.iResolutionLocation = 0
@@ -45,14 +45,13 @@ class glWidget(QOpenGLWidget,QObject):
         self.timer.setSingleShot(False)
         self.timer.start(1000./30.)
         
-        self.parent = parent
+        self.parent = parent.parentWidget().parentWidget().parentWidget()
 
     def tick(self) :
         dt = datetime.datetime.now()
         self.time = dt.minute*60.+dt.second*1.+dt.microsecond*1.e-6 - self.starttime
         self.repaint()
-        self.parent.timelabel.setText(str(dt-self.dst))
-        self.parent.timelabel.repaint()
+        self.parent.updateTime(str(dt-self.dst))
 
     def paintGL(self):
         if self.hasShader :

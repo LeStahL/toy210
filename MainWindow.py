@@ -44,16 +44,56 @@ class MainWindow(QMainWindow):
         self.ui = UiMainWindow.Ui_MainWindow()
         self.ui.setupUi(self)
         
+        self.ui.timeEdit = QLineEdit("22.3", self)
+        self.ui.timeEdit.setEnabled(False)
+        self.ui.toolBar_3.addWidget(self.ui.timeEdit)
+        
         self.pages = []
         
     def newSFX(self):
         return
     
     def newGFX(self):
-        page = GFXPage()
+        page = GFXPage(self)
         self.ui.tabWidget.addTab(page, QIcon(), "Untitled GFX*")
         self.pages += [page]
+        
+    def updateTime(self, text):
+        self.ui.actionTime.setText(text)
+        
+    def tabSwitched(self, index):
+        if isinstance(self.ui.tabWidget.widget(index), GFXPage):
+            self.enableEdit(True)
+            self.enablePlayback(True)
+            self.enableCapture(True, False, False)
+        #elif isinstance(self.ui.tabwidget.widget(index), SFXPage):
+            #TODO
+        else: # Welcome Page
+            self.enableEdit(False)
+            self.enablePlayback(False)
+            self.enableCapture(False, False, False)
+            
+    def enableEdit(self, state):
+        self.ui.actionUndo.setEnabled(state)
+        self.ui.actionRedo.setEnabled(state)
+        self.ui.actionCut.setEnabled(state)
+        self.ui.actionCopy.setEnabled(state)
+        self.ui.actionPaste.setEnabled(state)
+        self.ui.actionDelete.setEnabled(state)
+        self.ui.actionSelect_all.setEnabled(state)
     
+    def enablePlayback(self, state):
+        self.ui.actionPlay.setEnabled(state)
+        self.ui.actionReset.setEnabled(state)
+        self.ui.actionTime.setEnabled(state)
+        self.ui.timeEdit.setEnabled(state)
+        self.ui.actionSeek.setEnabled(state)
+        
+    def enableCapture(self, screen, sound, vid):
+        self.ui.actionScreenshot.setEnabled(screen)
+        self.ui.actionStream.setEnabled(sound)
+        self.ui.actionVideo.setEnabled(vid)
+        
         #self.splitter1 = QSplitter(self)
         #self.splitter2 = QSplitter(self)
         #self.splitter2.setOrientation(Qt.Vertical)

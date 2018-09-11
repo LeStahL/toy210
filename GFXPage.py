@@ -26,9 +26,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
 
 class GFXPage(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super(GFXPage, self).__init__()
         
-        ui = UiGFXPage.Ui_gfxPage()
-        ui.setupUi(self)
+        self.setParent(parent)
+        self.ui = UiGFXPage.Ui_gfxPage()
+        self.ui.setupUi(self)
         

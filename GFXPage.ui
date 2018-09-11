@@ -35,14 +35,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="gfxWidget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>400</width>
-         <height>200</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="glWidget" name="openGLWidget"/>
       <widget class="QTextEdit" name="textEdit"/>
      </widget>
      <widget class="QTextEdit" name="textEdit_2"/>
@@ -50,6 +43,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>glWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">GLWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

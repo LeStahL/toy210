@@ -244,6 +244,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         self.actionGFX_Shader.triggered.connect(MainWindow.newGFX)
         self.actionSFX_Shader.triggered.connect(MainWindow.newSFX)
+        self.tabWidget.currentChanged['int'].connect(MainWindow.tabSwitched)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

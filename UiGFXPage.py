@@ -21,9 +21,8 @@ class Ui_gfxPage(object):
         self.splitter = QtWidgets.QSplitter(self.splitter_2)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
-        self.gfxWidget = QtWidgets.QWidget(self.splitter)
-        self.gfxWidget.setMinimumSize(QtCore.QSize(400, 200))
-        self.gfxWidget.setObjectName("gfxWidget")
+        self.openGLWidget = glWidget(self.splitter)
+        self.openGLWidget.setObjectName("openGLWidget")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
         self.textEdit_2 = QtWidgets.QTextEdit(self.splitter_2)
@@ -37,3 +36,4 @@ class Ui_gfxPage(object):
         _translate = QtCore.QCoreApplication.translate
         gfxPage.setWindowTitle(_translate("gfxPage", "Form"))
 
+from GLWidget import glWidget
