@@ -48,6 +48,10 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.nsamples_real = 2*self.nblocks*self.blocksize
         self.duration_real = float(self.nsamples_real)/float(self.samplerate)
         self.image = [0]*self.blocksize*2
+        self.music = None
+        
+    def omusic(self) :
+        return self.music
     
     def paintGL(self):
         return
@@ -117,39 +121,12 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         #print music
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
-        left = []
-        right = []
-        
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
-        music = (float16(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
+        music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
         
-        fig = plt.figure()
-        plt.plot(range(512), music[:512])
-        fig.show()
-        
-        #for chunk in  [ music[0] ]:
-            #for i in range(len(chunk)) :
-                #for j in range(len(chunk[i])) :
-                    #bdata = pack('<4B', chunk[i][j][0], chunk[i][j][1], chunk[i][j][2], chunk[i][j][3])
-                    #lr = frombuffer(buffer(bdata), dtype=float16)
-                    #(l, r) = unpack('2E', bdata)
-                    #print lr
-                    #(left,) = unpack('f', pack('<bb', chunk[i][j].astype(bytes)))
-                    #(right,) = unpack('f', pack('<bb', chunk[i][j].astype(char)))
-                    #print left.astype(float16),right.astype(float16)
-                    #print chunk[i][j]
-        
-        #for i in range(len(music)) :
-            #for j in range(len(music[i])) :
-                #for k in range(len(music[i][j])) :
-                    #print music[i][j][k][:2].astype(float16)
-        #for chunk in music :
-            #print(len(chunk))
-            #(l,r) = unpack("e", str(byte))
-            #left += [l]
-            #right += [r]
-        #print left
-        
-        #print music
+        self.music = music
+        #fig = plt.figure()
+        #plt.plot(range(512), music[:512])
+        #fig.show()
         
         return b'Success.'

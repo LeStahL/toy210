@@ -31,6 +31,8 @@ from OpenGL.GLU import *
 import datetime
 from numpy import *
 
+import pyaudio
+
 class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -183,10 +185,22 @@ uniform float iSampleRate;\n\n"
         
         self.highlight = SyntaxHighlighter(self.editor.document())
         self.sfxhighlight = SyntaxHighlighter(self.editorsfx.document())
+        
+        p = pyaudio.PyAudio()
+
+        self.samplerate = 44100       # sampling rate, Hz, must be integer
+
+        # for paFloat32 sample values must be in range [-1.0, 1.0]
+        self.stream = p.open(format=pyaudio.paFloat32,
+                channels=2,
+                rate=self.samplerate,
+                output=True)
     
     def compileShaderSFX(self) :
         log = self.sfxglwidget.newShader(self.sfxprefix + self.editorsfx.toPlainText() + self.sfxsuffix).decode('utf-8')
         print(log)
+        
+        self.stream.write(self.sfxglwidget.omusic())
 
     def compileShader(self) :
         log = self.visuals.newShader(self.prefix + self.editor.toPlainText() + self.suffix).decode('utf-8')
