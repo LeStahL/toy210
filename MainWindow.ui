@@ -94,7 +94,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <widget class="QMenu" name="menuNew">
      <property name="title">
-      <string>New</string>
+      <string>&amp;New</string>
      </property>
      <addaction name="actionGFX_Shader"/>
      <addaction name="actionSFX_Shader"/>
@@ -104,7 +104,7 @@ p, li { white-space: pre-wrap; }
     </widget>
     <widget class="QMenu" name="menuExport">
      <property name="title">
-      <string>Export</string>
+      <string>&amp;Export</string>
      </property>
      <addaction name="actionScreenshot"/>
      <addaction name="actionVideo"/>
@@ -157,12 +157,86 @@ p, li { white-space: pre-wrap; }
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionGFX_Shader"/>
+   <addaction name="actionSFX_Shader"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionDelete"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar_3</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0, 0, 0);</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionPlay"/>
+   <addaction name="actionReset"/>
+   <addaction name="actionTime"/>
+   <addaction name="actionSeek"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_4">
+   <property name="windowTitle">
+    <string>toolBar_4</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionScreenshot"/>
+   <addaction name="actionStream"/>
+   <addaction name="actionVideo"/>
+  </widget>
   <action name="actionGFX_Shader">
    <property name="icon">
-    <iconset theme="document-new"/>
+    <iconset theme="document-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>GFX Shader</string>
+    <string>&amp;GFX Shader</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -170,10 +244,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSFX_Shader">
    <property name="icon">
-    <iconset theme="document-new"/>
+    <iconset theme="document-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>SFX Shader</string>
+    <string>&amp;SFX Shader</string>
    </property>
    <property name="shortcut">
     <string>Alt+N</string>
@@ -184,7 +259,7 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Sequence</string>
+    <string>S&amp;equence</string>
    </property>
   </action>
   <action name="action2D_Stack">
@@ -192,7 +267,7 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>2D Stack</string>
+    <string>&amp;2D Stack</string>
    </property>
   </action>
   <action name="action3D_Stack">
@@ -200,15 +275,16 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>3D Stack</string>
+    <string>&amp;3D Stack</string>
    </property>
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset theme="document-open"/>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Open...</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -216,15 +292,19 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionRecent">
    <property name="text">
-    <string>Recent</string>
+    <string>&amp;Recent</string>
    </property>
   </action>
   <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
-    <iconset theme="document-save"/>
+    <iconset theme="document-save">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -232,10 +312,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSave_As">
    <property name="icon">
-    <iconset theme="document-save-as"/>
+    <iconset theme="document-save-as">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Save As...</string>
+    <string>Sa&amp;ve As...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -243,15 +324,16 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSave_all">
    <property name="text">
-    <string>Save all</string>
+    <string>Save a&amp;ll</string>
    </property>
   </action>
   <action name="actionScreenshot">
    <property name="icon">
-    <iconset theme="camera"/>
+    <iconset theme="camera">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Screenshot...</string>
+    <string>&amp;Screenshot...</string>
    </property>
    <property name="shortcut">
     <string>F12</string>
@@ -259,10 +341,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionStream">
    <property name="icon">
-    <iconset theme="audio-x-generic"/>
+    <iconset theme="audio-x-generic">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Stream...</string>
+    <string>St&amp;ream...</string>
    </property>
    <property name="shortcut">
     <string>F11</string>
@@ -270,10 +353,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionVideo">
    <property name="icon">
-    <iconset theme="applications-multimedia"/>
+    <iconset theme="applications-multimedia">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Video...</string>
+    <string>&amp;Video...</string>
    </property>
    <property name="shortcut">
     <string>F10</string>
@@ -281,7 +365,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionClose">
    <property name="text">
-    <string>Close</string>
+    <string>&amp;Close</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -289,32 +373,41 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset theme="window-close"/>
+    <iconset theme="window-close">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionUndo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
-    <iconset theme="edit-undo"/>
+    <iconset theme="edit-undo">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>&amp;Undo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
    </property>
   </action>
   <action name="actionRedo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
-    <iconset theme="edit-redo"/>
+    <iconset theme="edit-redo">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Z</string>
@@ -322,10 +415,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset theme="edit-cut"/>
+    <iconset theme="edit-cut">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Cut</string>
+    <string>&amp;Cut</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
@@ -333,10 +427,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset theme="edit-copy"/>
+    <iconset theme="edit-copy">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string>C&amp;opy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -344,10 +439,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset theme="edit-paste"/>
+    <iconset theme="edit-paste">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -355,10 +451,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset theme="edit-delete"/>
+    <iconset theme="edit-delete">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string>&amp;Delete</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -366,10 +463,11 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSelect_all">
    <property name="icon">
-    <iconset theme="edit-select-all"/>
+    <iconset theme="edit-select-all">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Select all</string>
+    <string>&amp;Select all</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -377,20 +475,60 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionPreferences">
    <property name="icon">
-    <iconset theme="preferences-system"/>
+    <iconset theme="preferences-system">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Preferences...</string>
+    <string>&amp;Preferences...</string>
    </property>
   </action>
   <action name="actionAbout_Toy210">
    <property name="text">
-    <string>About Toy210...</string>
+    <string>&amp;About Toy210...</string>
    </property>
   </action>
   <action name="actionAbout_Team210">
    <property name="text">
-    <string>About Team210...</string>
+    <string>A&amp;bout Team210...</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="icon">
+    <iconset theme="media-playback-start">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+   <property name="text">
+    <string>Play</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="icon">
+    <iconset theme="media-skip-backward"/>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionTime">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>0:00:000</string>
+   </property>
+  </action>
+  <action name="actionSeek">
+   <property name="icon">
+    <iconset theme="media-seek-forward"/>
+   </property>
+   <property name="text">
+    <string>Seek</string>
    </property>
   </action>
  </widget>

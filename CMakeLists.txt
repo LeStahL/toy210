@@ -22,6 +22,7 @@ project(Toy210)
 # Generate ui
 set(TOY210_UI
     MainWindow
+    GFXPage
 )
 set(TOY210_UIPY)
 foreach(ui IN ITEMS ${TOY210_UI})
