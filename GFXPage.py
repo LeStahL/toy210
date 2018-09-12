@@ -50,6 +50,29 @@ class GFXPage(QWidget):
         
         self.parent = self.parentWidget()
         
+        self.defaultshader = '''void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}'''
+        self.ui.textEdit_2.insertPlainText(self.defaultshader)
+      
+        self.prefix = '''#version 130
+uniform float iTime;
+uniform vec2 iResolution;'''
+        self.suffix = '''void main()
+{
+    mainImage(gl_FragColor, gl_FragCoord.xy);
+}'''
+
+        self.filename = "Untitled GFX"
+        
     def modifyParent(self):
         if self.playing:
             self.parent.ui.actionPlay.setIcon(QIcon.fromTheme('media-playback-pause'))
@@ -71,12 +94,35 @@ class GFXPage(QWidget):
             dt = now - self.starttime
             self.parent.ui.actionFPS_0.setText('FPS: {:.1f}'.format(dt.total_seconds()*1.e3))
             self.starttime = now
+            
+        self.ui.openGLWidget.time = self.elapsed*1.e-3
+        self.ui.openGLWidget.repaint()
 
     def forward(self):
         try: 
             self.elapsed = 1.e3*float(self.parent.ui.timeEdit.text())
             self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
+            self.ui.openGLWidget.time = self.elapsed*1.e-3
+            self.ui.openGLWidget.repaint()
         except ValueError:
             QMessageBox(QMessageBox.Critical, "Cast failed.", "Could not convert "+self.parent.timeEdit.text()+" to float.", QMessageBox.Ok).exec_()
             
+    def reset(self):
+        self.elapsed = 0.
+        self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
+        self.ui.openGLWidget.time = self.elapsed*1.e-3
+        self.ui.openGLWidget.repaint()
+        
+    def close(self):
+        if self.ui.textEdit_2.undostack.isClean():
+            self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
+
+    def fullShader(self):
+        return self.prefix + self.ui.textEdit_2.toPlainText() + self.suffix
+
+    def compileShader(self):
+        self.log = self.ui.openGLWidget.compileShader(self.fullShader())
+        self.ui.textEdit.setPlainText(self.log)
+
+
         

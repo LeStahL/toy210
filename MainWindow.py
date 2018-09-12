@@ -70,10 +70,10 @@ class MainWindow(QMainWindow):
             self.enablePlayback(True)
             self.enableCapture(True, False, False)
             self.ui.tabWidget.widget(index).modifyParent()
-        #elif isinstance(self.ui.tabwidget.widget(index), SFXPage):
-            self.enableEdit(True)
-            self.enablePlayback(True)
-            self.enableCapture(False, True, False)
+        #elif isinstance(self.ui.tabwidget.widget(index), SFXPage): #TODO: include
+            #self.enableEdit(True)
+            #self.enablePlayback(True)
+            #self.enableCapture(False, True, False)
         else: # Welcome Page
             self.enableEdit(False)
             self.enablePlayback(False)
@@ -105,11 +105,23 @@ class MainWindow(QMainWindow):
         return
     
     def pause(self):
-        self.ui.tabWidget.widget(self.ui.tabWidget.currentIndex()).pause()
+        self.ui.tabWidget.currentWidget().pause()
         
     def forward(self):
-        self.ui.tabWidget.widget(self.ui.tabWidget.currentIndex()).forward()
+        self.ui.tabWidget.currentWidget().forward()
         
+    def reset(self):
+        self.ui.tabWidget.currentWidget().reset()
+
+    def closeOnly(self):
+        self.ui.tabWidget.currentWidget().close()
+        
+    def closeRequested(self, index):
+        self.ui.tabWidget.widget(index).close()
+    
+    def compile(self):
+        self.ui.tabWidget.currentWidget().compileShader()
+
         #self.splitter1 = QSplitter(self)
         #self.splitter2 = QSplitter(self)
         #self.splitter2.setOrientation(Qt.Vertical)

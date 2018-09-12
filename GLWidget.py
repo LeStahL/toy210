@@ -32,27 +32,14 @@ class glWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(320, 200)
+        
         self.program = 0
         self.iTimeLocation = 0
         self.iResolutionLocation = 0
         self.hasShader = False
-        self.dst = datetime.datetime.now()
-        self.starttime = self.dst.minute*60.+self.dst.second*1.+self.dst.microsecond*1.e-6
+        
         self.time = 0.
         
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.tick)
-        self.timer.setSingleShot(False)
-        #self.timer.start(1000./30.)
-        
-        self.parent = parent.parentWidget().parentWidget().parentWidget()
-
-    def tick(self) :
-        dt = datetime.datetime.now()
-        self.time = dt.minute*60.+dt.second*1.+dt.microsecond*1.e-6 - self.starttime
-        self.repaint()
-        self.parent.updateTime(str(dt-self.dst))
-
     def paintGL(self):
         if self.hasShader :
             glUseProgram(self.program)
@@ -82,7 +69,7 @@ class glWidget(QOpenGLWidget,QObject):
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
         
-    def newShader(self, source) :
+    def compileShader(self, source) :
         self.shader = glCreateShader(GL_FRAGMENT_SHADER)
         glShaderSource(self.shader, source)
         glCompileShader(self.shader)
@@ -108,4 +95,4 @@ class glWidget(QOpenGLWidget,QObject):
         
         self.hasShader = True
         
-        return b'Success.'
+        return 'Success.'
