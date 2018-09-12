@@ -20,6 +20,8 @@
 
 import UiSFXPage
 
+from SFXGLWidget import *
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -50,64 +52,30 @@ class SFXPage(QWidget):
         
         self.parent = self.parentWidget()
         
-        self.defaultshader = '''const float pi = acos(-1.);
-const vec3 c = vec3(1.,0.,-1.);
-
-// hash function
-float r(vec2 a0)
+        self.defaultshader = '''vec2 mainSound( float time )
 {
-    return fract(sin(dot(a0.xy ,vec2(12.9898,78.233)))*43758.5453);
-}
-
-// compute distance to regular star
-float dstar(vec2 x, float N, vec2 R)
-{
-    float d = pi/N,
-        p0 = acos(x.x/length(x)),
-        p = mod(p0, d),
-        i = mod(round((p-p0)/d),2.);
-    x = length(x)*vec2(cos(p),sin(p));
-    vec2 a = mix(R,R.yx,i),
-    	p1 = a.x*c.xy,
-        ff = a.y*vec2(cos(d),sin(d))-p1;
-   	ff = ff.yx*c.zx;
-    return dot(x-p1,ff)/length(ff);
-}
-
-#define A iResolution.y
-#define B 3./Y
-#define S(v) smoothstep(-1.5/A,1.5/A,v)
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-    float a = .1, aa = .5*a; // tile size
-    vec2 uv = fragCoord/A+.5,
-        x = mod(uv, a)-aa, y = uv-x; // we want many polygons
-    
-    //random number of edges and random rotation
-    float p = 5.*r(y)*iTime,
-        k = cos(p), s = sin(p),
-        d = dstar(mat2(k,s,-s,k)*x, 3.+floor(8.*r(y)), vec2(.15,.45)*a); 
-    
-    //set random colors
-    vec3 col = .5 + .5*cos(p+uv.xyx+vec3(0.,2.,4.));
-    fragColor = vec4(col*mix(S(d),1.,.5)+S(-abs(d)),1.);
-    
-    //add borders
-    vec2 v = smoothstep(-aa,-aa+1.5/A,x)*smoothstep(aa,aa-1.5/A,x);
-    fragColor *= v.x*v.y;
+    // A 440 Hz wave that attenuates quickly overt time
+    return vec2( sin(6.2831*440.0*time)*exp(-3.0*time) );
 }'''
         self.ui.textEdit.insertPlainText(self.defaultshader)
-      
+
         self.prefix = '''#version 130
-uniform float iTime;
-uniform vec2 iResolution;'''
+
+uniform float iBlockOffset;
+uniform float iSampleRate;'''
         self.suffix = '''void main()
 {
-    mainImage(gl_FragColor, gl_FragCoord.xy);
+   float t = iBlockOffset + ((gl_FragCoord.x-0.5) + (gl_FragCoord.y-0.5)*512.0)/iSampleRate;
+   vec2 y = mainSound( t );
+   vec2 v  = floor((0.5+0.5*y)*65536.0);
+   vec2 vl = mod(v,256.0)/255.0;
+   vec2 vh = floor(v/256.0)/255.0;
+   gl_FragColor = vec4(vl.x,vh.x,vl.y,vh.y);
 }'''
 
-        self.filename = "Untitled GFX"
-        
+        self.filename = "Untitled SFX"
+        self.music = None
+                
     def modifyParent(self):
         if self.playing:
             self.parent.ui.actionPlay.setIcon(QIcon.fromTheme('media-playback-pause'))
@@ -155,9 +123,14 @@ uniform vec2 iResolution;'''
     def fullShader(self):
         return self.prefix + self.ui.textEdit.toPlainText() + self.suffix
 
-    #def compileShader(self):
-        #self.log = self.ui.openGLWidget.compileShader(self.fullShader())
-        #self.ui.textEdit.setPlainText(self.log)
-
-
+    def compileShader(self):
+        glwidget = SFXGLWidget(self)
+        glwidget.move(10000.,1000.)
+        glwidget.show()
+        self.log = glwidget.newShader(self.fullShader())
+        self.ui.textEdit_2.setPlainText(self.log)
+        self.music = glwidget.music
+        
+        glwidget.hide()
+        glwidget.destroy()
         

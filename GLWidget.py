@@ -77,7 +77,7 @@ class glWidget(QOpenGLWidget,QObject):
         status = glGetShaderiv(self.shader, GL_COMPILE_STATUS)
         if status != GL_TRUE :
             log = glGetShaderInfoLog(self.shader)
-            return log
+            return log.decode('utf-8')
         
         self.program = glCreateProgram()
         glAttachShader(self.program, self.shader)
@@ -86,7 +86,7 @@ class glWidget(QOpenGLWidget,QObject):
         status = glGetProgramiv(self.program, GL_LINK_STATUS)
         if status != GL_TRUE :
             log = glGetProgramInfoLog(self.program)
-            return log
+            return log.decode('utf-8')
         
         self.iTimeLocation = glGetUniformLocation(self.program, 'iTime')
         self.iResolutionLocation = glGetUniformLocation(self.program, 'iResolution')

@@ -27,9 +27,8 @@ from OpenGL.GLU import *
 import datetime
 from numpy import *
 from struct import *
-import matplotlib.pyplot as plt
 
-class sfxGLWidget(QOpenGLWidget,QObject):
+class SFXGLWidget(QOpenGLWidget,QObject):
     def __init__(self, parent):
         QOpenGLWidget.__init__(self, parent)
         self.setMinimumSize(512,512)
@@ -50,19 +49,15 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.image = bytearray(self.blocksize*4)
         self.music = None
         
-    def omusic(self) :
-        return self.music
-    
-    def paintGL(self):
-        return
-    
+        self.parent = parent
+        
+        parent.ui.progressBar.setRange(0, self.nblocks-1)
+        
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
         
         self.framebuffer = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
-        
-        print("framebuffer: ", self.framebuffer)
         
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
@@ -83,7 +78,7 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         status = glGetShaderiv(self.shader, GL_COMPILE_STATUS)
         if status != GL_TRUE :
             log = glGetShaderInfoLog(self.shader)
-            return log
+            return log.decode('utf-8')
         
         self.program = glCreateProgram()
         glAttachShader(self.program, self.shader)
@@ -92,7 +87,7 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         status = glGetProgramiv(self.program, GL_LINK_STATUS)
         if status != GL_TRUE :
             log = glGetProgramInfoLog(self.program)
-            return log
+            return log.decode('utf-8')
         
         glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
         glUseProgram(self.program)
@@ -100,17 +95,14 @@ class sfxGLWidget(QOpenGLWidget,QObject):
         self.iBlockOffsetLocation = glGetUniformLocation(self.program, 'iBlockOffset')
         self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
         
-        print("blockoffsetlocation =",self.iBlockOffsetLocation)
-        print("sampleratelocation =", self.iSampleRateLocation)
-        
         OpenGL.UNSIGNED_BYTE_IMAGES_AS_STRING = True
         music = bytearray(self.nblocks*self.blocksize*4)
         
         for i in range(self.nblocks) :
+            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+            glUseProgram(self.program)
             glUniform1f(self.iBlockOffsetLocation, float32(i*self.blocksize)/float32(self.samplerate))
             glUniform1f(self.iSampleRateLocation, float32(self.samplerate)) 
-            print("block offset: ", float32(i*self.blocksize)/float32(self.samplerate))
-            print("sample rate: ", float32(self.samplerate))
             
             glViewport(0,0,512,512)
             
@@ -124,27 +116,15 @@ class sfxGLWidget(QOpenGLWidget,QObject):
             glFlush();
             
             music[4*i*self.blocksize:4*(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
-            print(i)
             
-        #print music
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+            glBindFramebuffer(GL_FRAMEBUFFER, 0)
+            self.parent.ui.progressBar.setValue(i)
+            
         
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
-        #print(music)
-        fig = plt.figure()
-        #for i in range(100) :
-            #plt.plot(range(8192), music[8192*i:8192*(i+1)]+float(2*i))
-        #plt.plot(range(8192), music[100*8192:101*8192])
-        #plt.plot(range(8192), music[self.blocksize:self.blocksize+8192])
-        for i in range(10) :
-            plt.plot(range(self.blocksize), music[i*self.blocksize:(i+1)*self.blocksize]+float(2*i))
-        fig.show()
         
         music = pack('<'+str(self.blocksize*self.nblocks*2)+'f', *music)
-        #print(music)
-        
         self.music = music
         
-        
-        return b'Success.'
+        return 'Success.'
