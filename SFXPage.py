@@ -110,16 +110,28 @@ uniform float iSampleRate;'''
         try: 
             self.elapsed = 1.e3*float(self.parent.ui.timeEdit.text())
             self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
-            #self.ui.openGLWidget.time = self.elapsed*1.e-3
-            #self.ui.openGLWidget.repaint()
+            self.pause()
+            self.audiobuffer.reset()
+            self.bytearray = QByteArray(self.music[int(self.parent.samplerate*self.elapsed*1.e-3)*4:])
+            self.audiobuffer = QBuffer(self.bytearray)
+            self.audiobuffer.open(QIODevice.ReadOnly)
+            self.audiooutput = QAudioOutput(self.parent.audioformat)
+            if not self.playing:
+                self.audiooutput.stop()
+            self.pause()
+            
         except ValueError:
             QMessageBox(QMessageBox.Critical, "Cast failed.", "Could not convert "+self.parent.timeEdit.text()+" to float.", QMessageBox.Ok).exec_()
+        except MemoryError:
+            QMessageBox(QMessageBox.Critical, "Skip failed.", "Could not skip to "+self.parent.timeEdit.text()+" .", QMessageBox.Ok).exec_()
             
     def reset(self):
         self.elapsed = 0.
         self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
         self.pause()
         self.audiobuffer.reset()
+        self.bytearray = QByteArray(self.music)
+        self.audiobuffer = QBuffer(self.bytearray)
         self.audiobuffer.open(QIODevice.ReadOnly)
         self.audiooutput = QAudioOutput(self.parent.audioformat)
         if not self.playing:
