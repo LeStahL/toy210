@@ -539,7 +539,7 @@ p, li { white-space: pre-wrap; }
     <string>Play</string>
    </property>
    <property name="shortcut">
-    <string>Space</string>
+    <string>Ctrl+Space</string>
    </property>
   </action>
   <action name="actionReset">

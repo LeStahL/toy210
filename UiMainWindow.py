@@ -338,7 +338,7 @@ class Ui_MainWindow(object):
         self.actionAbout_Toy210.setText(_translate("MainWindow", "&About Toy210..."))
         self.actionAbout_Team210.setText(_translate("MainWindow", "A&bout Team210..."))
         self.actionPlay.setText(_translate("MainWindow", "Play"))
-        self.actionPlay.setShortcut(_translate("MainWindow", "Space"))
+        self.actionPlay.setShortcut(_translate("MainWindow", "Ctrl+Space"))
         self.actionReset.setText(_translate("MainWindow", "Reset"))
         self.actionReset.setShortcut(_translate("MainWindow", "Ctrl+R"))
         self.actionTime.setText(_translate("MainWindow", "0:00:000"))

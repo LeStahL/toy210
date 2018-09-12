@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import UiGFXPage
+import UiSFXPage
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -27,12 +27,12 @@ from PyQt5.Qt import *
 
 from datetime import *
 
-class GFXPage(QWidget):
+class SFXPage(QWidget):
     def __init__(self, parent):
-        super(GFXPage, self).__init__()
+        super(SFXPage, self).__init__()
         
         self.setParent(parent)
-        self.ui = UiGFXPage.Ui_gfxPage()
+        self.ui = UiSFXPage.Ui_sfxPage()
         self.ui.setupUi(self)
         
         self.playing = False
@@ -96,7 +96,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 v = smoothstep(-aa,-aa+1.5/A,x)*smoothstep(aa,aa-1.5/A,x);
     fragColor *= v.x*v.y;
 }'''
-        self.ui.textEdit_2.insertPlainText(self.defaultshader)
+        self.ui.textEdit.insertPlainText(self.defaultshader)
       
         self.prefix = '''#version 130
 uniform float iTime;
@@ -114,7 +114,7 @@ uniform vec2 iResolution;'''
         else:
             self.parent.ui.actionPlay.setIcon(QIcon.fromTheme('media-playback-start'))
         self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
-        self.parent.ui.actionFPS_0.setText("FPS: 0")
+        self.parent.ui.actionFPS_0.setText("Sample rate: 44.1 kHz")
 
     def pause(self):
         self.playing = not self.playing
@@ -127,37 +127,37 @@ uniform vec2 iResolution;'''
 
             now = datetime.now()
             dt = now - self.starttime
-            self.parent.ui.actionFPS_0.setText('FPS: {:.1f}'.format(dt.total_seconds()*1.e3))
+            self.parent.ui.actionFPS_0.setText('Sample rate: 44.1 kHz')
             self.starttime = now
             
-        self.ui.openGLWidget.time = self.elapsed*1.e-3
-        self.ui.openGLWidget.repaint()
+        #self.ui.openGLWidget.time = self.elapsed*1.e-3
+        #self.ui.openGLWidget.repaint()
 
     def forward(self):
         try: 
             self.elapsed = 1.e3*float(self.parent.ui.timeEdit.text())
             self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
-            self.ui.openGLWidget.time = self.elapsed*1.e-3
-            self.ui.openGLWidget.repaint()
+            #self.ui.openGLWidget.time = self.elapsed*1.e-3
+            #self.ui.openGLWidget.repaint()
         except ValueError:
             QMessageBox(QMessageBox.Critical, "Cast failed.", "Could not convert "+self.parent.timeEdit.text()+" to float.", QMessageBox.Ok).exec_()
             
     def reset(self):
         self.elapsed = 0.
         self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
-        self.ui.openGLWidget.time = self.elapsed*1.e-3
-        self.ui.openGLWidget.repaint()
+        #self.ui.openGLWidget.time = self.elapsed*1.e-3
+        #self.ui.openGLWidget.repaint()
         
     def close(self):
-        if self.ui.textEdit_2.undostack.isClean():
+        if self.ui.textEdit.undostack.isClean():
             self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
 
     def fullShader(self):
-        return self.prefix + self.ui.textEdit_2.toPlainText() + self.suffix
+        return self.prefix + self.ui.textEdit.toPlainText() + self.suffix
 
-    def compileShader(self):
-        self.log = self.ui.openGLWidget.compileShader(self.fullShader())
-        self.ui.textEdit.setPlainText(self.log)
+    #def compileShader(self):
+        #self.log = self.ui.openGLWidget.compileShader(self.fullShader())
+        #self.ui.textEdit.setPlainText(self.log)
 
 
         

@@ -26,6 +26,7 @@ from SFXGLWidget import *
 
 import UiMainWindow
 from GFXPage import *
+from SFXPage import *
 
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
@@ -53,7 +54,10 @@ class MainWindow(QMainWindow):
         self.ui.tabWidget.setTabsClosable(True)
         
     def newSFX(self):
-        return
+        page = SFXPage(self)
+        self.ui.tabWidget.addTab(page, QIcon(), "Untitled SFX*")
+        self.ui.tabWidget.setCurrentWidget(page)
+        self.pages += [page]
     
     def newGFX(self):
         page = GFXPage(self)
@@ -70,10 +74,11 @@ class MainWindow(QMainWindow):
             self.enablePlayback(True)
             self.enableCapture(True, False, False)
             self.ui.tabWidget.widget(index).modifyParent()
-        #elif isinstance(self.ui.tabwidget.widget(index), SFXPage): #TODO: include
-            #self.enableEdit(True)
-            #self.enablePlayback(True)
-            #self.enableCapture(False, True, False)
+        elif isinstance(self.ui.tabWidget.widget(index), SFXPage):
+            self.enableEdit(True)
+            self.enablePlayback(True)
+            self.enableCapture(False, True, False)
+            self.ui.tabWidget.widget(index).modifyParent()
         else: # Welcome Page
             self.enableEdit(False)
             self.enablePlayback(False)
