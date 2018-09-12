@@ -124,6 +124,8 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.
         
+        self.omusic = music
+        
         music = pack('<'+str(self.blocksize*self.nblocks*2)+'f', *music)
         self.music = music
         

@@ -42,6 +42,14 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         
+        self.samplerate = 44100
+        self.nchannels = 2
+        
+        self.audioformat = QAudioFormat()
+        self.updateAudioFormat()
+        
+        self.audiodeviceinfo = QAudioDeviceInfo(QAudioDeviceInfo.defaultOutputDevice())
+        
         self.ui = UiMainWindow.Ui_MainWindow()
         self.ui.setupUi(self)
         
@@ -52,6 +60,14 @@ class MainWindow(QMainWindow):
         self.pages = []
         
         self.ui.tabWidget.setTabsClosable(True)
+        
+    def updateAudioFormat(self) :
+        self.audioformat.setSampleRate(self.samplerate)
+        self.audioformat.setChannelCount(self.nchannels)
+        self.audioformat.setSampleSize(32)
+        self.audioformat.setCodec("audio/pcm")
+        self.audioformat.setByteOrder(QAudioFormat.LittleEndian)
+        self.audioformat.setSampleType(QAudioFormat.Float)
         
     def newSFX(self):
         page = SFXPage(self)
@@ -83,6 +99,7 @@ class MainWindow(QMainWindow):
             self.enableEdit(False)
             self.enablePlayback(False)
             self.enableCapture(False, False, False)
+        self.setWindowTitle("Toy210 - " + self.ui.tabWidget.tabText(index))
             
     def enableEdit(self, state):
         self.ui.actionUndo.setEnabled(state)

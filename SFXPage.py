@@ -32,7 +32,9 @@ from datetime import *
 class SFXPage(QWidget):
     def __init__(self, parent):
         super(SFXPage, self).__init__()
-        
+   
+        self.audiooutput = None
+   
         self.setParent(parent)
         self.ui = UiSFXPage.Ui_sfxPage()
         self.ui.setupUi(self)
@@ -88,6 +90,12 @@ uniform float iSampleRate;'''
         self.playing = not self.playing
         self.modifyParent()
         
+        if self.audiooutput != None:
+            if self.playing :
+                self.audiooutput.start(self.audiobuffer)
+            else :
+                self.audiooutput.stop()
+        
     def tick(self):
         if self.playing:
             self.elapsed += self.frametime
@@ -98,9 +106,6 @@ uniform float iSampleRate;'''
             self.parent.ui.actionFPS_0.setText('Sample rate: 44.1 kHz')
             self.starttime = now
             
-        #self.ui.openGLWidget.time = self.elapsed*1.e-3
-        #self.ui.openGLWidget.repaint()
-
     def forward(self):
         try: 
             self.elapsed = 1.e3*float(self.parent.ui.timeEdit.text())
@@ -113,8 +118,13 @@ uniform float iSampleRate;'''
     def reset(self):
         self.elapsed = 0.
         self.parent.ui.actionTime.setText("{:.3f}".format(self.elapsed*1.e-3))
-        #self.ui.openGLWidget.time = self.elapsed*1.e-3
-        #self.ui.openGLWidget.repaint()
+        self.pause()
+        self.audiobuffer.reset()
+        self.audiobuffer.open(QIODevice.ReadOnly)
+        self.audiooutput = QAudioOutput(self.parent.audioformat)
+        if not self.playing:
+            self.audiooutput.stop()
+        self.pause()
         
     def close(self):
         if self.ui.textEdit.undostack.isClean():
@@ -133,4 +143,14 @@ uniform float iSampleRate;'''
         
         glwidget.hide()
         glwidget.destroy()
+        
+        self.bytearray = QByteArray(self.music)
+        
+        self.audiobuffer = QBuffer(self.bytearray)
+        self.audiobuffer.open(QIODevice.ReadOnly)
+        
+        self.audiooutput = QAudioOutput(self.parent.audioformat)
+        self.audiooutput.stop()
+
+        #self.parentWidget().stream.write(self.music)
         
