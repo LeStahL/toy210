@@ -48,6 +48,7 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         self.duration_real = float(self.nsamples_real)/float(self.samplerate)
         self.image = None
         self.music = None
+        self.omusic = None
         
         self.parent = parent
         
@@ -120,7 +121,7 @@ class SFXGLWidget(QOpenGLWidget,QObject):
             music[4*i*self.blocksize:4*(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
             
             self.parent.ui.progressBar.setValue(i)
-            print(i)
+            #for c in range(50): print(i)
         
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.

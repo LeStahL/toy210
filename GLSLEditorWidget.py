@@ -45,7 +45,7 @@ class GLSLEditorWidget(QTextEdit):
             
     def keyPressEvent(self, e):
         noinsert_keys = [ Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down, Qt.Key_End, Qt.Key_Home, Qt.Key_PageDown, Qt.Key_PageUp, Qt.Key_Backspace, Qt.Key_Delete ]
-        if e.modifiers() == Qt.NoModifier and not e.key() in noinsert_keys:
+        if not e.modifiers() & Qt.ControlModifier and not e.key() in noinsert_keys:
                 self.undostack.push(UndoInsertText(self, self.textCursor(), e.text()))
                 return
         
@@ -86,4 +86,7 @@ class GLSLEditorWidget(QTextEdit):
     def redo(self):
         if self.undostack.canRedo():
             self.undostack.redo()
+            
+    def changed(self):
+        print("changed text")
             

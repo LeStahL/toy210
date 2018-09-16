@@ -26,8 +26,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
+from PyQt5.QtChart import *
 
 from datetime import *
+from numpy import *
 
 class SFXPage(QWidget):
     def __init__(self, parent):
@@ -140,7 +142,11 @@ uniform float iSampleRate;'''
         
     def close(self):
         if self.ui.textEdit.undostack.isClean():
-            self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
+            return True
+        else:
+            msg = QMessageBox(QMessageBox.Warning, "Unsaved progress...", self.parent.ui.tabWidget.tabText(self.parent.ui.tabWidget.currentIndex()) + " is unsaved. Save?", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+            msg.exec_()
+            return False
 
     def fullShader(self):
         return self.prefix + self.ui.textEdit.toPlainText() + self.suffix
@@ -153,6 +159,7 @@ uniform float iSampleRate;'''
         self.log = glwidget.newShader(self.fullShader())
         self.ui.textEdit_2.setPlainText(self.log)
         self.music = glwidget.music
+        self.omusic = glwidget.omusic
         
         glwidget.hide()
         glwidget.destroy()
@@ -165,5 +172,79 @@ uniform float iSampleRate;'''
         self.audiooutput = QAudioOutput(self.parent.audioformat)
         self.audiooutput.stop()
 
-        #self.parentWidget().stream.write(self.music)
+        lineseries = QLineSeries()
+        i = 0
+        for sample in self.omusic[:int(512*512/20)]:
+            lineseries.append(QPointF(i, sample))
+            i += 1
+        
+        chart = QChart()
+        chart.addSeries(lineseries)
+        
+        xaxis = QValueAxis()
+        xaxis.setRange(0, i)
+        xaxis.setLabelFormat("%g")
+        xaxis.setTitleText("Samples")
+        
+        yaxis = QValueAxis()
+        yaxis.setRange(-1., 1.)
+        yaxis.setLabelFormat("%g")
+        yaxis.setTitleText("Sound")
+        
+        chart.setAxisX(xaxis)
+        chart.setAxisY(yaxis)
+        chart.legend().hide()
+        
+        self.ui.graphicsView.setChart(chart)
+        
+        lineseries2 = QLineSeries()
+        i = 0
+        val = self.omusic[:int(512*512/20)]
+        y = fft.fft(val)
+        y = y[:int(len(y)/20)]
+        for sample in y:
+            lineseries2.append(QPointF(i, abs(sample)))
+            i += 1
+        
+        chart2 = QChart()
+        chart2.addSeries(lineseries2)
+        
+        xaxis2 = QValueAxis()
+        xaxis2.setRange(0, i)
+        xaxis2.setLabelFormat("%g")
+        xaxis2.setTitleText("Freq")
+        
+        yaxis2 = QValueAxis()
+        yaxis2.setRange(min(y), max(y))
+        yaxis2.setLabelFormat("%g")
+        yaxis2.setTitleText("FFT")
+        
+        chart2.setAxisX(xaxis2)
+        chart2.setAxisY(yaxis2)
+        chart2.legend().hide()
+        
+        self.ui.graphicsView_2.setChart(chart2)
+        
+        
+    def cut(self):
+        self.ui.textEdit.cut()
+        
+    def copy(self):
+        self.ui.textEdit.copy()
+        
+    def paste(self):
+        self.ui.textEdit.paste()
+        
+    def delete(self):
+        self.ui.textEdit.cut()
+        
+    def selectAll(self):
+        self.ui.textEdit.selectAll()
+        
+    def undo(self):
+        self.ui.textEdit.undo()
+        
+    def redo(self):
+        self.ui.textEdit.redo()
+        
         

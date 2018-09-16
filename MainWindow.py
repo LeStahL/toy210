@@ -18,12 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#TODO: remove
-from GLWidget import *
-from SFXGLWidget import *
-
-#TODO: end
-
 import UiMainWindow
 from GFXPage import *
 from SFXPage import *
@@ -37,6 +31,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import datetime
 from numpy import *
+
+from PyQt5.QtChart import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -60,6 +56,7 @@ class MainWindow(QMainWindow):
         self.pages = []
         
         self.ui.tabWidget.setTabsClosable(True)
+        
         
         # TODO fix icons on windows
         #self.ui.actionClose.setIcon(self.style().standardIcon(QStyle.SP_DialogCloseButton))
@@ -128,8 +125,15 @@ class MainWindow(QMainWindow):
         self.ui.actionVideo.setEnabled(vid)
         
     def quit(self): #TODO: proper save messages 
-        qApp.quit()
-        return
+        saved = False
+        for page in self.pages:
+            self.ui.tabWidget.setCurrentWidget(page)
+            saved = saved and page.close()
+            if saved:
+                self.ui.tabWidget.removeTab(page)
+        if saved:
+            qApp.quit()
+            return
     
     def pause(self):
         self.ui.tabWidget.currentWidget().pause()
@@ -141,11 +145,15 @@ class MainWindow(QMainWindow):
         self.ui.tabWidget.currentWidget().reset()
 
     def closeOnly(self):
-        self.ui.tabWidget.currentWidget().close()
+        saved = self.ui.tabWidget.currentWidget().close()
+        if saved:
+            self.ui.tabWidget.removeTab(self.ui.tabWidget.currentWidget())
         
     def closeRequested(self, index):
-        self.ui.tabWidget.widget(index).close()
-    
+        saved = self.ui.tabWidget.widget(index).close()
+        if saved:
+            self.ui.tabWidget.removeTab(self.ui.tabWidget.widget(index).close())
+            
     def compile(self):
         self.ui.tabWidget.currentWidget().compileShader()
         
