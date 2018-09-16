@@ -61,6 +61,11 @@ class MainWindow(QMainWindow):
         
         self.ui.tabWidget.setTabsClosable(True)
         
+        # TODO fix icons on windows
+        #self.ui.actionClose.setIcon(self.style().standardIcon(QStyle.SP_DialogCloseButton))
+        #self.ui.actionCompile.setIcon(self.style().standardIcon(QStyle.SP_ArrowForward))
+        #self.ui.actionCopy
+        
     def updateAudioFormat(self) :
         self.audioformat.setSampleRate(self.samplerate)
         self.audioformat.setChannelCount(self.nchannels)
@@ -143,6 +148,28 @@ class MainWindow(QMainWindow):
     
     def compile(self):
         self.ui.tabWidget.currentWidget().compileShader()
+        
+    def copy(self):
+        self.ui.tabWidget.currentWidget().copy()
+        
+    def paste(self):
+        self.ui.tabWidget.currentWidget().paste()
+        
+    def cut(self):
+        self.ui.tabWidget.currentWidget().cut()
+        
+    def delete(self):
+        self.ui.tabWidget.currentWidget().delete()
+        
+    def selectAll(self):
+        self.ui.tabWidget.currentWidget().selectAll()
+        
+    def undo(self):
+        print ("undone.")
+        self.ui.tabWidget.currentWidget().undo()
+    
+    def redo(self):
+        self.ui.tabWidget.currentWidget().redo()
 
         #self.splitter1 = QSplitter(self)
         #self.splitter2 = QSplitter(self)

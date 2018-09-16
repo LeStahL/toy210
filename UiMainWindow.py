@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -261,8 +261,14 @@ class Ui_MainWindow(object):
         self.actionQuit.triggered.connect(MainWindow.quit)
         self.actionReset.triggered.connect(MainWindow.reset)
         self.tabWidget.tabCloseRequested['int'].connect(MainWindow.closeRequested)
-        self.actionClose.triggered.connect(MainWindow.closeOnly)
+        self.actionCopy.triggered.connect(MainWindow.copy)
         self.actionCompile.triggered.connect(MainWindow.compile)
+        self.actionCut.triggered.connect(MainWindow.cut)
+        self.actionDelete.triggered.connect(MainWindow.delete)
+        self.actionPaste.triggered.connect(MainWindow.paste)
+        self.actionRedo.triggered.connect(MainWindow.redo)
+        self.actionSelect_all.triggered.connect(MainWindow.selectAll)
+        self.actionUndo.triggered.connect(MainWindow.undo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -271,18 +277,18 @@ class Ui_MainWindow(object):
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600; color:#4e9a06;\">Toy210</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The Team210 demo tool. Create awesome demo art with less effort.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Find it on <a href=\"https://www.github.com/lestahl/toy210\"><span style=\" text-decoration: underline; color:#4e9a06;\">GitHub</span></a>.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Contributors: <a href=\"https://github.com/lestahl\"><span style=\" text-decoration: underline; color:#4e9a06;\">NR4</span></a>, <a href=\"https://github.com/stadelmaier\"><span style=\" text-decoration: underline; color:#4e9a06;\">MX</span></a></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600; color:#4e9a06;\">Team210</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">We are some people that are all in some way connected to the <a href=\"https://www.z10.info\"><span style=\" text-decoration: underline; color:#4e9a06;\">Z10</span></a> Karlsruhe. We like demos, and we make our own. This is the tool that we wrote to make this process more automated.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Find us on <a href=\"https://demozoo.org/groups/76968/\"><span style=\" text-decoration: underline; color:#4e9a06;\">Demozoo</span></a></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Recent work: <a href=\"https://www.pouet.net/prod.php?which=77876\"><span style=\" text-decoration: underline; color:#4e9a06;\">Eternal Darkness @ Evoke 2k18</span></a></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Members: <a href=\"https://demozoo.org/sceners/76970/\"><span style=\" text-decoration: underline; color:#4e9a06;\">NR4</span></a> (Code, GFX), <a href=\"https://demozoo.org/sceners/76971/\"><span style=\" text-decoration: underline; color:#4e9a06;\">QM</span></a> (Code, SFX), MIC (Hardware Support)</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:14pt; font-weight:600; color:#4e9a06;\">Toy210</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">The Team210 demo tool. Create awesome demo art with less effort.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">Find it on </span><a href=\"https://www.github.com/lestahl/toy210\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">GitHub</span></a><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">Contributors: </span><a href=\"https://github.com/lestahl\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">NR4</span></a><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">, </span><a href=\"https://github.com/stadelmaier\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">MX</span></a></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Cantarell\'; font-size:11pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:14pt; font-weight:600; color:#4e9a06;\">Team210</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">We are some people that are all in some way connected to the </span><a href=\"https://www.z10.info\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">Z10</span></a><span style=\" font-family:\'Cantarell\'; font-size:11pt;\"> Karlsruhe. We like demos, and we make our own. This is the tool that we wrote to make this process more automated.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">Find us on </span><a href=\"https://demozoo.org/groups/76968/\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">Demozoo</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">Recent work: </span><a href=\"https://www.pouet.net/prod.php?which=77876\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">Eternal Darkness @ Evoke 2k18</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Cantarell\'; font-size:11pt;\">Members: </span><a href=\"https://demozoo.org/sceners/76970/\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">NR4</span></a><span style=\" font-family:\'Cantarell\'; font-size:11pt;\"> (Code, GFX), </span><a href=\"https://demozoo.org/sceners/76971/\"><span style=\" font-family:\'Cantarell\'; font-size:11pt; text-decoration: underline; color:#4e9a06;\">QM</span></a><span style=\" font-family:\'Cantarell\'; font-size:11pt;\"> (Code, SFX), MIC (Hardware Support)</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Cantarell\'; font-size:11pt;\"><br /></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.welcomeTab), _translate("MainWindow", "Welcome"))
         self.menuFile.setTitle(_translate("MainWindow", "Fi&le"))
         self.menuNew.setTitle(_translate("MainWindow", "&New"))
