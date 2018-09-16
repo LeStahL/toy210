@@ -164,6 +164,9 @@ uniform float iSampleRate;'''
         glwidget.hide()
         glwidget.destroy()
         
+        if self.music == None :
+            return
+        
         self.bytearray = QByteArray(self.music)
         
         self.audiobuffer = QBuffer(self.bytearray)
