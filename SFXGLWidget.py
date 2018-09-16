@@ -46,7 +46,9 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         self.blocksize = 512*512
         self.nsamples_real = 2*self.nblocks*self.blocksize
         self.duration_real = float(self.nsamples_real)/float(self.samplerate)
-        self.image = bytearray(self.blocksize*4)
+        self.image = None
+        #self.image = pack('<'+str(self.blocksize)+'f', *bytearray(self.blocksize))
+        #self.image = None
         self.music = None
         
         self.parent = parent
@@ -54,15 +56,17 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         parent.ui.progressBar.setRange(0, self.nblocks-1)
         
     def initializeGL(self):
+        print("Init.")
         glEnable(GL_DEPTH_TEST)
         
         self.framebuffer = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
-        
+        print("Bound buffer.")
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
+        print("Bound texture with id ", self.texture)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.image)
-        
+        print("Teximage2D returned.")
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
@@ -71,6 +75,7 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture, 0)
         
     def newShader(self, source) :
+        
         self.shader = glCreateShader(GL_FRAGMENT_SHADER)
         glShaderSource(self.shader, source)
         glCompileShader(self.shader)
@@ -99,7 +104,7 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         music = bytearray(self.nblocks*self.blocksize*4)
         
         for i in range(self.nblocks) :
-            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
+            #glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
             glUseProgram(self.program)
             glUniform1f(self.iBlockOffsetLocation, float32(i*self.blocksize)/float32(self.samplerate))
             glUniform1f(self.iSampleRateLocation, float32(self.samplerate)) 
@@ -117,9 +122,9 @@ class SFXGLWidget(QOpenGLWidget,QObject):
             
             music[4*i*self.blocksize:4*(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
             
-            glBindFramebuffer(GL_FRAMEBUFFER, 0)
+            #glBindFramebuffer(GL_FRAMEBUFFER, 0)
             self.parent.ui.progressBar.setValue(i)
-            
+            print(i)
         
         music = unpack('<'+str(self.blocksize*self.nblocks*2)+'H', music)
         music = (float32(music)-32768.)/32768. # scale onto right interval. FIXME render correctly, then this is not needed.

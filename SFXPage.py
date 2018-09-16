@@ -147,6 +147,7 @@ uniform float iSampleRate;'''
 
     def compileShader(self):
         glwidget = SFXGLWidget(self)
+        
         glwidget.move(10000.,1000.)
         glwidget.show()
         self.log = glwidget.newShader(self.fullShader())
