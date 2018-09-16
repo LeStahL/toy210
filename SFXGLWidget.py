@@ -47,8 +47,6 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         self.nsamples_real = 2*self.nblocks*self.blocksize
         self.duration_real = float(self.nsamples_real)/float(self.samplerate)
         self.image = None
-        #self.image = pack('<'+str(self.blocksize)+'f', *bytearray(self.blocksize))
-        #self.image = None
         self.music = None
         
         self.parent = parent
@@ -104,7 +102,6 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         music = bytearray(self.nblocks*self.blocksize*4)
         
         for i in range(self.nblocks) :
-            #glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer)
             glUseProgram(self.program)
             glUniform1f(self.iBlockOffsetLocation, float32(i*self.blocksize)/float32(self.samplerate))
             glUniform1f(self.iSampleRateLocation, float32(self.samplerate)) 
@@ -122,7 +119,6 @@ class SFXGLWidget(QOpenGLWidget,QObject):
             
             music[4*i*self.blocksize:4*(i+1)*self.blocksize] = glReadPixels(0, 0, 512, 512, GL_RGBA, GL_UNSIGNED_BYTE)
             
-            #glBindFramebuffer(GL_FRAMEBUFFER, 0)
             self.parent.ui.progressBar.setValue(i)
             print(i)
         
