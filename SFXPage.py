@@ -77,6 +77,23 @@ uniform float iSampleRate;'''
    gl_FragColor = vec4(vl.x,vh.x,vl.y,vh.y);
 }'''
 
+        self.license_header = '''/* Project name
+ * Copyright (C) 2018  Alexander Kraus <nr4@z10.info>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */'''
+        
         self.filename = "Untitled SFX"
         self.music = None
                 
@@ -144,9 +161,18 @@ uniform float iSampleRate;'''
         if self.ui.textEdit.undostack.isClean():
             return True
         else:
-            msg = QMessageBox(QMessageBox.Warning, "Unsaved progress...", self.parent.ui.tabWidget.tabText(self.parent.ui.tabWidget.currentIndex()) + " is unsaved. Save?", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-            msg.exec_()
-            return False
+            msg = QMessageBox(QMessageBox.Warning, "Unsaved progress...", self.parent.ui.tabWidget.tabText(self.parent.ui.tabWidget.currentIndex()) + " is unsaved. Save?", QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            msg.setDefaultButton(QMessageBox.Cancel)
+            result = msg.exec_()
+            
+            if result == QMessageBox.Save:
+                self.save()
+            elif result == QMessageBox.Cancel:
+                return False
+            return True
+        
+    def save(self):
+        return
 
     def fullShader(self):
         return self.prefix + self.ui.textEdit.toPlainText() + self.suffix

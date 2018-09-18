@@ -21,6 +21,7 @@
 import UiMainWindow
 from GFXPage import *
 from SFXPage import *
+from Preferences import *
 
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
@@ -57,6 +58,14 @@ class MainWindow(QMainWindow):
         
         self.ui.tabWidget.setTabsClosable(True)
         
+        self.preferences = Preferences(".toy210")
+        self.preferences.load()
+        
+        # Populate recent projects list
+        if self.preferences.hasRecents():
+            self.ui.menu_Recent.removeAction(self.ui.actionNone)
+            for filename in self.preferences.recentfiles:
+                self.ui.menu_Recent.addAction(QAction(QIcon(None), filename, self.ui.menu_Recent))
         
         # TODO fix icons on windows
         #self.ui.actionClose.setIcon(self.style().standardIcon(QStyle.SP_DialogCloseButton))
@@ -125,13 +134,14 @@ class MainWindow(QMainWindow):
         self.ui.actionVideo.setEnabled(vid)
         
     def quit(self): #TODO: proper save messages 
-        saved = False
+        saved = True
         for page in self.pages:
             self.ui.tabWidget.setCurrentWidget(page)
             saved = saved and page.close()
             if saved:
-                self.ui.tabWidget.removeTab(page)
+                self.ui.tabWidget.removeTab(self.ui.tabWidget.indexOf(page))
         if saved:
+            self.preferences.save()
             qApp.quit()
             return
     
@@ -178,6 +188,55 @@ class MainWindow(QMainWindow):
     
     def redo(self):
         self.ui.tabWidget.currentWidget().redo()
+        
+    def openFile(self):
+        filename = str(QFileDialog.getOpenFileName(self, "Open...", "", "Shaders (*.frag *.glsl)")[0])
+        
+        if filename == "":
+            return
+        
+        self.preferences.addRecent(filename)
+        self.preferences.openfiles += [ filename ]
+        
+        lines = ""
+        filetext = ""
+        try:
+            with open(filename, "rt") as f:
+                lines = f.readlines()
+                filetext = ''.join(lines)
+                f.close()
+        except:
+            msg = QMessageBox(QMessageBox.Error, "Could not open file...", "Could not open file " + filename + ".", QMessageBox.Ok)
+            result = msg.exec_()
+            return
+        
+        page = SFXPage(self)
+        self.ui.tabWidget.addTab(page, QIcon(), filename)
+        self.ui.tabWidget.setCurrentWidget(page)
+        self.pages += [page]
+        
+        # read license header if present and parse info
+        if lines[0].startswith("/*"):
+            last = 0
+            for i in range(len(lines)):
+                if lines[i] == " */":
+                    last = i
+            page.license_header = ''.join(lines[:last+1])
+            print("page.license_header")
+            
+            
+        
+        
+    def saveFile(self):
+        return
+        
+        #was_running = self.running
+        #if self.running :
+            #self.pauseTime()
+            
+        #self.filename = str(QFileDialog.getOpenFileName(self, "Open...","","Shaders (*.frag *.glsl)")[0])
+        #if self.filename == "" : return
+        
 
         #self.splitter1 = QSplitter(self)
         #self.splitter2 = QSplitter(self)
