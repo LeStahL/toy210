@@ -68,7 +68,7 @@ class Preferences:
                     self.recentfiles[i] = filename
                     return
         else:
-            for i in range(9):
+            for i in range(8):
                 self.recentfiles[9-i] = self.recentfiles[9-i-1]
             self.recentfiles[0] = filename
         

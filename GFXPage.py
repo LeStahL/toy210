@@ -152,8 +152,17 @@ uniform vec2 iResolution;'''
         self.ui.openGLWidget.repaint()
         
     def close(self):
-        if self.ui.textEdit_2.undostack.isClean():
+        #FIXME: keep track of undo stack clean state
+        result = QMessageBox(QMessageBox.Warning, "Unsaved progress.", "Unsaved shader " + self.filename + ". Save?", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel).exec_()
+        if result == QMessageBox.Yes:
+            self.save()
+            return True
             self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
+        elif result == QMessageBox.No:
+            return True
+            self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
+        else:
+            return False
 
     def fullShader(self):
         return self.prefix + self.ui.textEdit_2.toPlainText() + self.suffix
@@ -163,7 +172,6 @@ uniform vec2 iResolution;'''
         self.ui.textEdit.setPlainText(self.log)
 
     def save(self):
-        print("saved.")
         if self.filename == "Untitled GFX":
             self.filename = str(QFileDialog.getSaveFileName(self, "Save...", "~", "Fragment shaders (*.frag)")[0])
         
