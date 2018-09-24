@@ -24,6 +24,7 @@ set(TOY210_UI
     MainWindow
     GFXPage
     SFXPage
+    PreferencesDialog
 )
 set(TOY210_UIPY)
 foreach(ui IN ITEMS ${TOY210_UI})

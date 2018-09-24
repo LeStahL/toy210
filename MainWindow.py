@@ -22,6 +22,7 @@ import UiMainWindow
 from GFXPage import *
 from SFXPage import *
 from Preferences import *
+from PreferencesDialog import *
 
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
@@ -228,7 +229,14 @@ class MainWindow(QMainWindow):
         
         
     def saveFile(self):
-        return
+        self.ui.tabWidget.currentWidget().save()
+        
+    def saveAs(self):
+        self.ui.tabWidget.currentWidget().saveAs()
+        
+    def preferences(self):
+        dialog = PreferencesDialog(self)
+        dialog.exec()
         
         #was_running = self.running
         #if self.running :

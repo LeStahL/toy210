@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
         self.actionOpen.setIcon(icon)
         self.actionOpen.setObjectName("actionOpen")
         self.actionSave = QtWidgets.QAction(MainWindow)
-        self.actionSave.setEnabled(False)
+        self.actionSave.setEnabled(True)
         icon = QtGui.QIcon.fromTheme("document-save")
         self.actionSave.setIcon(icon)
         self.actionSave.setObjectName("actionSave")
@@ -274,6 +274,9 @@ class Ui_MainWindow(object):
         self.actionSelect_all.triggered.connect(MainWindow.selectAll)
         self.actionUndo.triggered.connect(MainWindow.undo)
         self.actionOpen.triggered.connect(MainWindow.openFile)
+        self.actionSave_As.triggered.connect(MainWindow.saveAs)
+        self.actionSave.triggered.connect(MainWindow.saveFile)
+        self.actionPreferences.triggered.connect(MainWindow.preferences)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -357,5 +360,5 @@ class Ui_MainWindow(object):
         self.actionFPS_0.setText(_translate("MainWindow", "FPS: 0"))
         self.actionCompile.setText(_translate("MainWindow", "&Compile"))
         self.actionCompile.setShortcut(_translate("MainWindow", "F5"))
-        self.actionNone.setText(_translate("MainWindow", "None"))
+        self.actionNone.setText(_translate("MainWindow", "&None"))
 

@@ -19,6 +19,7 @@
 #
 
 import UiGFXPage
+import PreferencesDialog
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -26,6 +27,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import *
 
 from datetime import *
+from LicenseHeader import *
 
 class GFXPage(QWidget):
     def __init__(self, parent):
@@ -107,6 +109,7 @@ uniform vec2 iResolution;'''
 }'''
 
         self.filename = "Untitled GFX"
+        self.license_header = LicenseHeader()
         
     def modifyParent(self):
         if self.playing:
@@ -159,5 +162,37 @@ uniform vec2 iResolution;'''
         self.log = self.ui.openGLWidget.compileShader(self.fullShader())
         self.ui.textEdit.setPlainText(self.log)
 
-
+    def save(self):
+        print("saved.")
+        if self.filename == "Untitled GFX":
+            self.filename = str(QFileDialog.getSaveFileName(self, "Save...", "~", "Fragment shaders (*.frag)")[0])
         
+        if self.filename == "":
+            return
+        
+        savetext = self.license_header.toString() + "\n\n"
+        savetext += self.prefix
+        savetext += self.ui.textEdit_2.toPlainText()
+        savetext += "\n\n" + self.suffix
+        
+        try:
+            with open(self.filename, "wt") as f:
+                f.write(savetext)
+                f.close()
+        except:
+            msg = QMessageBox(QMessageBox.Error, "Could not save file...", "Could not save file " + self.filename + ".", QMessageBox.Ok)
+            result = msg.exec_()
+            return
+
+    def saveAs(self):
+        self.filename = str(QFileDialog.getSaveFileName(self, "Save...", "", "Fragment shaders (*.frag)")[0])
+        
+        if self.filename == "":
+            return
+        
+        self.parent.ui.tabWidget.setTabText(self.parent.ui.tabWidget.currentIndex(), self.filename)
+
+        self.save()
+        
+    def preferences(self):
+        return
