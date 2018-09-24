@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         self.ui.actionStream.setEnabled(sound)
         self.ui.actionVideo.setEnabled(vid)
         
-    def quit(self): #TODO: proper save messages 
+    def quit(self):
         saved = True
         for page in self.pages:
             self.ui.tabWidget.setCurrentWidget(page)
@@ -196,35 +196,39 @@ class MainWindow(QMainWindow):
         if filename == "":
             return
         
-        self.preferences.addRecent(filename)
-        self.preferences.openfiles += [ filename ]
+        #FIXME add recent files
+        #self.preferences.addRecent(filename)
+        #self.preferences.openfiles += [ filename ]
         
-        lines = ""
+        lines = None
         filetext = ""
         try:
             with open(filename, "rt") as f:
-                lines = f.readlines()
-                filetext = ''.join(lines)
+                filetext = f.read()
+                lines = filetext.split('\n')
                 f.close()
         except:
             msg = QMessageBox(QMessageBox.Error, "Could not open file...", "Could not open file " + filename + ".", QMessageBox.Ok)
             result = msg.exec_()
             return
         
-        page = SFXPage(self)
-        self.ui.tabWidget.addTab(page, QIcon(), filename)
-        self.ui.tabWidget.setCurrentWidget(page)
-        self.pages += [page]
-        
-        # read license header if present and parse info
-        if lines[0].startswith("/*"):
-            last = 0
-            for i in range(len(lines)):
-                if lines[i] == " */":
-                    last = i
-            page.license_header = ''.join(lines[:last+1])
-            print("page.license_header")
+        page = None
+        if filetext.contains("mainSound"):
+            page = SFXPage(self)
+            self.ui.tabWidget.addTab(page, QIcon(), filename)
+            self.ui.tabWidget.setCurrentWidget(page)
+            self.pages += [page]
+        elif filetext.contains("mainImage"):
+            page = GFXPage(self)
+            self.ui.tabWidget.addTab(page, QIcon(), filename)
+            self.ui.tabWidget.setCurrentWidget(page)
+            self.pages += [page]
+        else:
+            result = QMessageBox(QMessageBox.Error, "Shader type not known.", "File contains a shader that can not be loaded by toy210.", QMessageBox.Ok).exec_()
+            return
             
+        page.license_header.fromString(''.join(lines[:16]))
+        #page.ui.
             
         
         
