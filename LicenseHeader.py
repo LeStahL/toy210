@@ -50,8 +50,8 @@ class LicenseHeader:
         
         header += " * Copyright (C) " + self.year + " " + self.author + " <" + self.email + ">\n"
         
-        self.header += " * \n"
-        self.header += ''' * This program is free software: you can redistribute it and/or modify
+        header += " *\n"
+        header += ''' * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -69,7 +69,7 @@ class LicenseHeader:
     
     def fromString(self, string):
         lines = string.split('\n')
-        data = lines[0].split(" by ")
+        data = lines[0][3:].split(" by ")
         self.demoname = data[0]
         data = data[1].split("/")
         self.authorhandle = data[0]
@@ -78,6 +78,10 @@ class LicenseHeader:
         data = data[1].split(" at ")
         self.compo = data[0]
         data = data[1].split(' ')
-        self.party = ' '.join(data[:-2])
-        self.year = data[-1]
+        self.party = ' '.join(data)
+        
+        data = lines[1][3:].split(" ")
+        self.year = data[2]
+        self.author = ' '.join(data[3:-1])
+        self.email = data[-1].replace('<','').replace('>','')
         
