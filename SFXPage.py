@@ -21,6 +21,7 @@
 import UiSFXPage
 
 from SFXGLWidget import *
+from DialBlock import *
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -96,6 +97,8 @@ uniform float iSampleRate;'''
         
         self.filename = "Untitled SFX"
         self.music = None
+        
+        self.dial_blocks = []
                 
     def modifyParent(self):
         if self.playing:
@@ -175,7 +178,7 @@ uniform float iSampleRate;'''
         return
 
     def fullShader(self):
-        return self.prefix + self.ui.textEdit.toPlainText() + self.suffix
+        return self.prefix + self.additionalUniforms() + self.ui.textEdit.toPlainText() + self.suffix
 
     def compileShader(self):
         glwidget = SFXGLWidget(self)
@@ -276,4 +279,14 @@ uniform float iSampleRate;'''
     def redo(self):
         self.ui.textEdit.redo()
         
+    def addDialBlock(self):
+        block = DialBlock(self)
+        self.ui.verticalLayout_5.addWidget(block)
+        self.dial_blocks += [block]
+        self.update()
         
+    def additionalUniforms(self):
+        str = ""
+        for block in self.dial_blocks:
+            str += "uniform float " + block.name + ";\n"
+        return str

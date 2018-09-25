@@ -25,6 +25,7 @@ set(TOY210_UI
     GFXPage
     SFXPage
     PreferencesDialog
+    DialBlock
 )
 set(TOY210_UIPY)
 foreach(ui IN ITEMS ${TOY210_UI})
