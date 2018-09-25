@@ -191,7 +191,7 @@ class MainWindow(QMainWindow):
         self.ui.tabWidget.currentWidget().redo()
         
     def openFile(self):
-        filename = str(QFileDialog.getOpenFileName(self, "Open...", "", "Shaders (*.frag *.glsl)")[0])
+        filename = str(QFileDialog.getOpenFileName(self, "Open...", "", "Shaders (*.frag)")[0])
         
         if filename == "":
             return
@@ -213,12 +213,12 @@ class MainWindow(QMainWindow):
             return
         
         page = None
-        if filetext.contains("mainSound"):
+        if "mainSound" in filetext:
             page = SFXPage(self)
             self.ui.tabWidget.addTab(page, QIcon(), filename)
             self.ui.tabWidget.setCurrentWidget(page)
             self.pages += [page]
-        elif filetext.contains("mainImage"):
+        elif "mainImage" in filetext:
             page = GFXPage(self)
             self.ui.tabWidget.addTab(page, QIcon(), filename)
             self.ui.tabWidget.setCurrentWidget(page)
@@ -226,11 +226,12 @@ class MainWindow(QMainWindow):
         else:
             result = QMessageBox(QMessageBox.Error, "Shader type not known.", "File contains a shader that can not be loaded by toy210.", QMessageBox.Ok).exec_()
             return
-            
-        page.license_header.fromString(''.join(lines[:16]))
-        #page.ui.
-            
         
+        header = '\n'.join(lines[:16])
+        page.license_header.fromString(header)
+        
+        body = filetext.replace(header, "").replace(page.prefix, "").replace(page.suffix, "")
+        page.ui.textEdit_2.setPlainText(body)
         
     def saveFile(self):
         self.ui.tabWidget.currentWidget().save()
