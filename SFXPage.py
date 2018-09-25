@@ -31,6 +31,7 @@ from PyQt5.QtChart import *
 
 from datetime import *
 from numpy import *
+from LicenseHeader import *
 
 class SFXPage(QWidget):
     def __init__(self, parent):
@@ -61,7 +62,7 @@ class SFXPage(QWidget):
 {
     // A 440 Hz wave that attenuates quickly overt time
     return vec2( sin(6.2831*440.0*time)*exp(-3.0*time) );
-}'''
+}\n\n'''
         self.ui.textEdit.insertPlainText(self.defaultshader)
 
         self.prefix = '''#version 130
@@ -78,22 +79,7 @@ uniform float iSampleRate;'''
    gl_FragColor = vec4(vl.x,vh.x,vl.y,vh.y);
 }'''
 
-        self.license_header = '''/* Project name
- * Copyright (C) 2018  Alexander Kraus <nr4@z10.info>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */'''
+        self.license_header = LicenseHeader()
         
         self.filename = "Untitled SFX"
         self.music = None
@@ -161,22 +147,53 @@ uniform float iSampleRate;'''
         self.pause()
         
     def close(self):
-        if self.ui.textEdit.undostack.isClean():
+        #FIXME: keep track of undo stack clean state
+        result = QMessageBox(QMessageBox.Warning, "Unsaved progress.", "Unsaved shader " + self.filename + ". Save?", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel).exec_()
+        if result == QMessageBox.Yes:
+            self.save()
             return True
+            self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
+        elif result == QMessageBox.No:
+            return True
+            self.parent.ui.tabWidget.removeTab(self.parent.ui.tabWidget.indexOf(self))
         else:
-            msg = QMessageBox(QMessageBox.Warning, "Unsaved progress...", self.parent.ui.tabWidget.tabText(self.parent.ui.tabWidget.currentIndex()) + " is unsaved. Save?", QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-            msg.setDefaultButton(QMessageBox.Cancel)
-            result = msg.exec_()
-            
-            if result == QMessageBox.Save:
-                self.save()
-            elif result == QMessageBox.Cancel:
-                return False
-            return True
+            return False
         
     def save(self):
+        if self.filename == "Untitled SFX":
+            self.filename = str(QFileDialog.getSaveFileName(self, "Save...", "~", "Fragment shaders (*.frag)")[0])
+        
+        if self.filename == "":
+            return
+        
+        savetext = self.license_header.toString() + "\n\n"
+        savetext += self.prefix
+        savetext += self.ui.textEdit.toPlainText()
+        savetext += "\n\n" + self.suffix
+        
+        try:
+            with open(self.filename, "wt") as f:
+                f.write(savetext)
+                f.close()
+        except:
+            msg = QMessageBox(QMessageBox.Error, "Could not save file...", "Could not save file " + self.filename + ".", QMessageBox.Ok)
+            result = msg.exec_()
+            return
         return
 
+    def saveAs(self):
+        self.filename = str(QFileDialog.getSaveFileName(self, "Save...", "", "Fragment shaders (*.frag)")[0])
+        
+        if self.filename == "":
+            return
+        
+        self.parent.ui.tabWidget.setTabText(self.parent.ui.tabWidget.currentIndex(), self.filename)
+
+        self.save()
+
+    def saveableShader(self):
+        return self.prefix + self.ui.textEdit.toPlainText() + self.suffix
+        
     def fullShader(self):
         return self.prefix + self.additionalUniforms() + self.ui.textEdit.toPlainText() + self.suffix
 

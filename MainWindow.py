@@ -227,11 +227,16 @@ class MainWindow(QMainWindow):
             result = QMessageBox(QMessageBox.Error, "Shader type not known.", "File contains a shader that can not be loaded by toy210.", QMessageBox.Ok).exec_()
             return
         
+        page.filename = filename
+        
         header = '\n'.join(lines[:16])
         page.license_header.fromString(header)
         
         body = filetext.replace(header, "").replace(page.prefix, "").replace(page.suffix, "")
-        page.ui.textEdit_2.setPlainText(body)
+        if "mainSound" in filetext:
+            page.ui.textEdit.setPlainText(body)
+        elif "mainImage" in filetext:
+            page.ui.textEdit_2.setPlainText(body)
         
     def saveFile(self):
         self.ui.tabWidget.currentWidget().save()
