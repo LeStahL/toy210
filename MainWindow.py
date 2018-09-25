@@ -230,9 +230,12 @@ class MainWindow(QMainWindow):
         page.filename = filename
         
         header = '\n'.join(lines[:16])
-        page.license_header.fromString(header)
-        
-        body = filetext.replace(header, "").replace(page.prefix, "").replace(page.suffix, "")
+        try:
+            page.license_header.fromString(header)
+            body = filetext.replace(header, "").replace(page.prefix, "").replace(page.suffix, "")
+        except:
+            print("Warning: Could not parse license header. Importing empty.")
+            body = filetext.replace(page.prefix, "").replace(page.suffix, "")
         if "mainSound" in filetext:
             page.ui.textEdit.setPlainText(body)
         elif "mainImage" in filetext:
