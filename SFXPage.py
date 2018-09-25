@@ -181,6 +181,8 @@ uniform float iSampleRate;'''
         return self.prefix + self.additionalUniforms() + self.ui.textEdit.toPlainText() + self.suffix
 
     def compileShader(self):
+        starttime = datetime.now()
+        
         glwidget = SFXGLWidget(self)
         
         for block in self.dial_blocks:
@@ -207,6 +209,10 @@ uniform float iSampleRate;'''
         
         self.audiooutput = QAudioOutput(self.parent.audioformat)
         self.audiooutput.stop()
+
+        endtime = datetime.now()
+        el = endtime - starttime
+        self.parent.ui.actiontCompile_0.setText("tCompile: {:.3f}s".format(el.total_seconds()))
 
         lineseries = QLineSeries()
         i = 0
