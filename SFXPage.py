@@ -183,6 +183,10 @@ uniform float iSampleRate;'''
     def compileShader(self):
         glwidget = SFXGLWidget(self)
         
+        for block in self.dial_blocks:
+            glwidget.params += [ block.name ]
+            glwidget.values += [ block.value ]
+        
         glwidget.move(10000.,1000.)
         glwidget.show()
         self.log = glwidget.newShader(self.fullShader())

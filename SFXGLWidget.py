@@ -52,6 +52,9 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         
         self.parent = parent
         
+        self.params = []
+        self.values = []
+        
         parent.ui.progressBar.setRange(0, self.nblocks-1)
         
     def initializeGL(self):
@@ -98,6 +101,10 @@ class SFXGLWidget(QOpenGLWidget,QObject):
         
         self.iBlockOffsetLocation = glGetUniformLocation(self.program, 'iBlockOffset')
         self.iSampleRateLocation = glGetUniformLocation(self.program, 'iSampleRate')
+        
+        for i in range(len(self.params)):
+            location = glGetUniformLocation(self.program, self.params[i])
+            glUniform1f(location, self.values[i])
         
         OpenGL.UNSIGNED_BYTE_IMAGES_AS_STRING = True
         music = bytearray(self.nblocks*self.blocksize*4)

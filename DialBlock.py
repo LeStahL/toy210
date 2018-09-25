@@ -42,68 +42,97 @@ class DialBlock(QWidget):
         
         self.name = "p0"
         
-    def updateUi(self, dial, slider, low, high, value, checks, text):
-        print(dial,slider,low,high,value,checks, text)
+        self.ui.lineEdit.setText(self.name)
+        self.ui.radioButton_2.setChecked(self.Logscale)
+        self.ui.radioButton.setChecked(not self.Logscale)
         
-        if self.high == self.low:
-            return
+        self.ui.doubleSpinBox_3.setValue(self.value)
+        self.ui.doubleSpinBox_2.setValue(self.high)
+        self.ui.doubleSpinBox.setValue(self.low)
         
         r = int((self.value-self.low)/(self.high-self.low)*100.)
-        print(r)
-        if dial:
-            self.ui.dial.setValue(r)
         
-        if low:
-            self.ui.doubleSpinBox.setValue(self.low)
-        if high:
-            self.ui.doubleSpinBox_2.setValue(self.high)
-        if value:
-            self.ui.doubleSpinBox_3.setValue(self.value)
-
-        if slider:
-            self.ui.horizontalSlider.setValue(r)
-        
-        if checks:
-            self.ui.radioButton_2.setChecked(self.Logscale)
-            self.ui.radioButton.setChecked(not self.Logscale)
-        
-        if text:
-            self.ui.lineEdit.setText(self.name)
+        self.ui.dial.setValue(r)
+        self.ui.horizontalSlider.setValue(r)
         
     def lowChanged(self, value):
         self.low = float(self.ui.doubleSpinBox.value())
-        self.updateUi(True, True, True, False, False, False, False)
+        
+        if (self.low > self.high) or (self.low > self.value):
+            self.low = self.high
+            self.ui.doubleSpinBox.setValue(self.low)
+        
+        if self.low == self.high:
+            return
+        
+        r = int((self.value-self.low)/(self.high-self.low)*100.)
+        
+        self.ui.dial.setValue(r)
+        self.ui.horizontalSlider.setValue(r)
+        
         return
     
     def highChanged(self, value):
         self.high = float(self.ui.doubleSpinBox_2.value())
-        self.updateUi(True, True, False, True, False, False, False)
+        
+        if (self.high < self.low) or (self.high < self.value):
+            self.high = self.low
+            self.ui.doubleSpinBox_2.setValue(self.high)
+        
+        if self.low == self.high:
+            return
+        
+        r = int((self.value-self.low)/(self.high-self.low)*100.)
+        
+        self.ui.dial.setValue(r)
+        self.ui.horizontalSlider.setValue(r)
+        
         return
     
     def valueChanged(self, value):
         self.value = float(self.ui.doubleSpinBox_3.value())
-        self.updateUi(True, True, False, False, True, False, False)
+        
+        if (self.value < self.low):
+            self.value = self.low
+            self.ui.doubleSpinBox_3.setValue(self.value)
+        if self.value > self.high:
+            self.value = self.high
+            self.ui.doubleSpinBox_3.setValue(self.value)
+        
+        if self.low == self.high:
+            return
+        
+        r = int((self.value-self.low)/(self.high-self.low)*100.)
+        
+        self.ui.dial.setValue(r)
+        self.ui.horizontalSlider.setValue(r)
+        
         return
     
     def linSelected(self, state):
         self.Logscale = not state
-        self.updateUi(False, False, False, False, False, True, False)
+        
+        self.ui.radioButton_2.setChecked(self.Logscale)
+        self.ui.radioButton.setChecked(not self.Logscale)
         return
     
     def logSelected(self, state):
         self.Logscale = state
-        self.updateUi(False, False, False, False, False, True, False)
+        
+        self.ui.radioButton_2.setChecked(self.Logscale)
+        self.ui.radioButton.setChecked(not self.Logscale)
+        
         return
     
     def dialTurned(self, value):
-        #print("dial turned.")
         if self.Logscale:
             return
             self.value = np.exp(self.low) + float(value)/float(self.ui.dial.maximum())*(np.exp(self.high) - np.exp(self.low))
         else:
             self.value = self.low + float(value)/float(self.ui.dial.maximum())*(self.high - self.low)
-        #print(self.value)
-        self.updateUi(False, True, False, False, True, False, False)
+        
+        self.ui.doubleSpinBox_3.setValue(self.value)
+        
         return
     
     def sliderMoved(self, value):
@@ -112,7 +141,9 @@ class DialBlock(QWidget):
             self.value = np.exp(self.low) + float(value)/float(self.ui.horizontalSlider.maximum())*(np.exp(self.high) - np.exp(self.low))
         else:
             self.value = self.low + float(value)/float(self.ui.horizontalSlider.maximum())*(self.high - self.low)
-        self.updateUi(True, False, False, False, True, False, False)
+        
+        self.ui.doubleSpinBox_3.setValue(self.value)
+        
         return
     
     def xPressed(self):
