@@ -62,13 +62,13 @@ class SFXPage(QWidget):
 {
     // A 440 Hz wave that attenuates quickly overt time
     return vec2( sin(6.2831*440.0*time)*exp(-3.0*time) );
-}\n\n'''
+}'''
         self.ui.textEdit.insertPlainText(self.defaultshader)
 
         self.prefix = '''#version 130
 
 uniform float iBlockOffset;
-uniform float iSampleRate;'''
+uniform float iSampleRate;\n\n'''
         self.suffix = '''void main()
 {
    float t = iBlockOffset + ((gl_FragCoord.x-0.5) + (gl_FragCoord.y-0.5)*512.0)/iSampleRate;
